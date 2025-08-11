@@ -1,0 +1,61 @@
+﻿外界寻路流程
+new一个AStarFinder，调用StartPathFind,传入自身位置和目标位置,和一个栈
+就会返回一个栈，依次取出就是对应的下一步的格子
+若需要改变格子则：通过public MainGrid<PathNode> GetMainGridObj()来获得寻路网格对象
+
+
+G值：GCost，表示实际距离，通过当前节点到邻居节点的距离+当前节点的G值，就是邻居节点的G值，当邻居节点已经在开放列表中时，就需要更新G值
+H值：HCost，表示预估距离，通过判断当前节点和邻居节点的x，y差距，x差距和y差距中哪个小，就说明需要用到多少个斜方格，这两个差距之间的差值就表示需要用到多少个垂直方格
+F值：GCost，表示总距离
+
+每次从开放列表中选出 “最优点（当前节点）” 后，需要对其所有不在关闭列表中的邻居（通常是 8 个方向）计算一遍 “通过当前节点到达该邻居的新 G 值”
+无论这个邻居是否已经在开放列表中。
+已在开放列表中：表示之前通过其他路径发现过该节点，但通过当前节点到达该邻居的路径可能更短（G 值更小）。
+所以G值要更新
+
+
+GetPathNode(int x, int y)：
+	通过GetPathNode(int x, int y)来获取指定坐标的节点，若是越界坐标就会返回空
+
+int CalculationPathCost(PathNode node,PathNode endNode)
+	计算总距离，包括预估距离和实际距离
+	预估距离通过判断当前节点的x和y坐标来判断是否是斜向方格
+	并且把计算好的总距离赋值给节点的GCost
+
+private List<PathNode> GetSurroundNode(PathNode node)
+	传入一个当前节点，得到周围的节点，包括自己（会进行筛选，这个过程会把自己筛选掉，因为上一步选出最小点后就会把最小点这个加入关闭列表）
+	筛选的时候，记得要筛选斜向移动的格子的上下左右，如果上下左右都有的话就要排除掉,避免斜向穿墙
+
+private PathNode DequeueOpenlist()
+	Try方法尝试取出，取不出则返回空节点。表示开放列表中已经没有对象，终点无法到达
+	Try方法取出失败的话要把字典清空，同步字典，
+
+private PathNode OpenToClose(PathNode node)
+	参数node都是上一步选出的最优点，本身已经在关闭列表中
+	通过GetSurroundNode(node)得到有效节点的列表，每次遍历执行：调用CheckUpdatGCost(PathNode node, PathNode fathernode);设置父节点；计算节点的总代价；加入开放列表；
+	list中的是经过筛选的的节点，都是可以加入开放列表的，直接加入
+	遍历完成后取出最优点，再加入关闭列表
+
+private bool CheckUpdatGCost(PathNode node, PathNode fathernode)
+	作用：当取出邻居节点的时候，经过简单的筛选后都是有效节点，但是这是包括关闭列表中和开放列表中的节点的，所以取出后的遍历需要再次筛选一遍
+	对于在开放列表中的检查对于目前的节点，是否有新的更优值，有的话加入开放列表，开放字典进行更新；对于在关闭列表中的，也是检查是否有新的更优值
+
+private void GetFinallyPath(PathNode node)
+	循环获取下一步的点
+	除了起点，不用把点加入关闭列表，因为取出最小点的时候就已经加入关闭列表了
+	通过OpenToClose(PathNode node)来获得最优点
+	判断最优点是否是终点
+	通过优先队列已经空了来判断是否无法到达目标点:
+	OpenToClose(PathNode node)中最后会有DequeueOpenlist()方法，若列表为空则返回空节点，这个空节点会作为循环的参数，函数内会判断循环得到的节点是否为空，为空则退出循环
+这里使用循环而不是递归，避免栈溢出。
+
+private bool CheckUpdatGCost(PathNode node, PathNode fathernode)
+	用于检查节点是否已经存在与开放列表中，如果存在则检查当前节点到该节点的实际距离是否更短，如果不存在则跳出返回false
+	如果距离更短的话：更新节点的G值，更新节点父对象，更像开放列表中的优先队列和字典
+
+
+问题：
+
+重置所有节点后再次寻路，会寻路失败，而且循环中只找八个邻居节点
+	解决：原因是节点的重置方法吧节点的坐标也重置了，而坐标应该是一开始创建的时候才会分配的
+
