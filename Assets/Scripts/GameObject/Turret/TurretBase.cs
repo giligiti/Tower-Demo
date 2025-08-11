@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class TurretBase : MonoBehaviour, IInit
+public class TurretBase : MonoBehaviour, IInit, IGetFloat
 {
-    [SerializeField] private ScriptableObject bulletFactory;
-    [SerializeField] private ScriptableObject effFactory;
+    [SerializeField] private ScriptableObject bulletFactory;    //子弹工厂
+    [SerializeField] private ScriptableObject effFactory;       //开火特效工厂
 
     public Transform yawObject;                                 //炮塔旋转台
     public Transform pitchObject;                               //炮口旋转轴
@@ -20,6 +20,8 @@ public class TurretBase : MonoBehaviour, IInit
 
     public GameObject targetObj;                                //测试的目标
     public float direction;
+
+    public float Range => attackedRange;
 
     //初始化方法
     public void Init<T>(T info)where T : InfoData

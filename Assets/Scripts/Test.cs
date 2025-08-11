@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using TMPro;
+using PathFind;
 using UnityEngine;
 
 public class Test : MonoBehaviour

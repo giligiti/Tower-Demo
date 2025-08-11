@@ -1,4 +1,5 @@
 using System;
+using PathFind;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -72,7 +73,7 @@ public class MainGrid<T> where T : class, IGridNodes
 
         origin = GetGridToWorldPosition(width / 2, height / 2);
 
-        gridParent = new GameObject("Grid"); // GameObject.FindGameObjectsWithTag("GridText")[0];
+        gridParent = new GameObject("Grid"); 
 
         Quaternion q = Quaternion.AngleAxis(90, Vector3.right);
         for (int i = 0; i < width; i++)
@@ -81,6 +82,8 @@ public class MainGrid<T> where T : class, IGridNodes
             {
                 //实例化网格的预制体
                 GameObject obj = GameObject.Instantiate(Resources.Load<GameObject>("Grid/GridCell"), GetGridToWorldPosition(i, j, true), q, gridParent.transform);
+
+                obj.transform.localScale = new Vector3(gridSize, gridSize, 1);
 
                 //传入的节点相关
                 T p = obj.GetComponent<T>();
@@ -170,7 +173,7 @@ public class MainGrid<T> where T : class, IGridNodes
 
     public int GetGridValue(int x, int y)
     {
-        if (TranslateGridCoordinates(ref x, ref y))
+        if (!TranslateGridCoordinates(ref x, ref y))
             throw new Exception("数组越界");
 
         return GridArray[x, y];
@@ -186,7 +189,7 @@ public class MainGrid<T> where T : class, IGridNodes
     public void SetGridValue(int x, int y, int value)
     {
         //对冲原点变化/检查越界
-        if (TranslateGridCoordinates(ref x, ref y))
+        if (!TranslateGridCoordinates(ref x, ref y))
         {
             Debug.Log("输入数组越界");
             return;
@@ -221,6 +224,12 @@ public class MainGrid<T> where T : class, IGridNodes
         StaticBatchingUtility.Combine(gridParent);
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
     private bool TranslateGridCoordinates(ref int x, ref int y)
     {
         //对冲原点变化
@@ -242,9 +251,13 @@ public class MainGrid<T> where T : class, IGridNodes
         y -= height / 2;
     }
 
+    /// <summary>
+    /// 恢复因为原点变化而导致节点产生的变化
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
     public void ReCorrectGrid(ref int x, ref int y)
     {
-        //对冲原点变化
         x += width / 2;
         y += height / 2;
     }

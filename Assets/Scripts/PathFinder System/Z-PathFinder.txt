@@ -59,3 +59,5 @@ private bool CheckUpdatGCost(PathNode node, PathNode fathernode)
 重置所有节点后再次寻路，会寻路失败，而且循环中只找八个邻居节点
 	解决：原因是节点的重置方法吧节点的坐标也重置了，而坐标应该是一开始创建的时候才会分配的
 
+
+使用接口解耦A星寻路逻辑和节点
