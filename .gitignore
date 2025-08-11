@@ -3,7 +3,7 @@
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
 
-#自定义规则，只保留代码
+#自定义规则
 /Assets/*
 !/Assets/Scripts
 
