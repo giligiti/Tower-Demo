@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public abstract class BaseHumanoid<T,Y> : MonoBehaviour where T : Attacked where Y : MoveBody
+public abstract class BaseHumanoid<T, Y> : MonoBehaviour, IDeath where T : Attacked where Y : MoveBody
 {
     public int health;
     public int maxHealth;
@@ -14,13 +14,13 @@ public abstract class BaseHumanoid<T,Y> : MonoBehaviour where T : Attacked where
     public CharacterController controller;
 
     public UnityEvent DeadEvent;    //角色死亡事件，方便集中处理人物模块内的脚本的注册和注销
-    
+
     //初始化在工厂完成
 
     public virtual void Awake()
     {
         //controller组件
-        controller =  bodyRigRoot.GetComponent<CharacterController>();
+        controller = bodyRigRoot.GetComponent<CharacterController>();
 
     }
     protected virtual void OnEnable()
@@ -36,6 +36,18 @@ public abstract class BaseHumanoid<T,Y> : MonoBehaviour where T : Attacked where
     private void controllerLose()
     {
         controller.enabled = false;
+    }
+
+    /// <summary>
+    /// 提供给外界订阅物体死亡事件
+    /// </summary>
+    public void SubscribeDeathEvent(UnityAction action)
+    {
+        DeadEvent.AddListener(action);
+    }
+    public void UnsubscribeDeathEvent(UnityAction action)
+    {
+        DeadEvent.RemoveListener(action);
     }
 
 }

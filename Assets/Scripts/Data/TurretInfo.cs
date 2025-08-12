@@ -17,6 +17,7 @@ public class TurretInfo : InfoData
     public int atkRange;
     public int atkSpeed;
     public int roundSpeed;
+    public int horizontalAngle;
     public int verticalSpeed;
     public float verticalAngleUp;
     public float verticalAngleDown;

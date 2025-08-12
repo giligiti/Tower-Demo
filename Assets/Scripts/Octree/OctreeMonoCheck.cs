@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
-using ToolSpace;
 using UnityEngine;
 
 namespace Octree
 {
-    public class OctreeRoomCheck : OctreeMono
+    public class OctreeMonoCheck : OctreeMono
     {
         [HideInInspector] public Bounds checkBounds;                          //最近邻检测包围盒//初筛无大碍
         public float range;                                 //检测距离
 
-        HashSet<OctreeNode> octSet = new HashSet<OctreeNode>();     //存储所有的八叉树节点
+        HashSet<OctreeNode> octSet = new HashSet<OctreeNode>();     //存储周围的的八叉树节点
 
         HashSet<GameObject> TargetObjects = new HashSet<GameObject>();      //得到对象位置信息,避免一直new，声明成字段
         /// <summary>
@@ -19,8 +18,8 @@ namespace Octree
         /// <param name="range"></param>
         public void InitRange()
         {
-            if (TryGetComponent<IGetFloat>(out IGetFloat AtkRange))
-                this.range = AtkRange.Range;
+            if (TryGetComponent<IGetRange>(out IGetRange AtkRange))
+                this.range = AtkRange.Range / 10;                           //修改
             //创建检测范围包围盒
             checkBounds = new Bounds(bounds.center, new Vector3(range, range, range));
         }
@@ -33,7 +32,9 @@ namespace Octree
         protected override void Update()
         {
             base.Update();
+            //更新检测范围包围盒的位置并更新节点表
             CheckBoundsPosition();
+            //维护节点表
             CheckSurroundNodeList();
 
         }
@@ -54,17 +55,18 @@ namespace Octree
         }
         #region 空间划分检测
         /// <summary>
-        /// 提供一个最近的目标的位置信息
+        /// 提供一个最近的物体
         /// </summary>
         /// <param name="action">筛选条件</param>
         /// <param name="priority">自定义优先级排序</param>
+        /// priority需要接收一个参数，是自身到目标的距离，返回的是自定义的优先级，默认小顶堆（越小越优先）
         /// <returns></returns>
-        public GameObject ProvideTargetPosition(Func<GameObject, bool> action = null, Func<float, float> priority = null)
+        public HashSet<GameObject> ProvideTargets()
         {
+            //避免残留
             TargetObjects.Clear();
-            //创建优先队列
-            CustomePriorityQueue<GameObject, float> priorityQueue = new CustomePriorityQueue<GameObject, float>();
-            //遍历所有节点
+            
+            //遍历所有节点，把节点的物体全部加入到集合中
             foreach (var obj in octSet)
             {
                 //如果节点未存储物体则跳过
@@ -76,26 +78,8 @@ namespace Octree
                     TargetObjects.Add(octMono.octMonoObj.gameObject);
                 }
             }
-            //处理所有节点
-            foreach (GameObject obj in TargetObjects)
-            {
-                if (action != null)
-                {
-                    //如果不符合条件则跳过该物体
-                    if (!action(obj)) continue;
-                }
-
-                float distance = Vector3.Distance(transform.position, obj.transform.position);
-                //实现自定义优先级排序
-                if (priority != null) distance = priority(distance);
-
-                priorityQueue.Enqueue(obj, distance);
-            }
-            GameObject nearObj = priorityQueue.Dequeue();
-            //调试：绘制自身到目标的红线
-            Debug.DrawLine(transform.position, nearObj.transform.position, Color.red);
-
-            return nearObj;                                                                    //修改
+            
+            return TargetObjects;                                                                    //修改
         }
 
         /// <summary>
