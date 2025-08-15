@@ -10,7 +10,7 @@ public class TurretFactory : ScriptableObject, IFactory
         TurretInfo info = GameDataMgr.Instance.turretInfos[turretID];
         //实例化
         GameObject obj = PoolMgr.Instance.GetObject<TurretPoolData>(info.name,info.prefabPath);
-        IInit b = obj.GetComponent<IInit>();
+        IInit b = obj.GetComponent<TurretBase>();
         //初始化
         
         obj.transform.position = position;

@@ -19,7 +19,7 @@ namespace Octree
         public void InitRange()
         {
             if (TryGetComponent<IGetRange>(out IGetRange AtkRange))
-                this.range = AtkRange.Range / 10;                           //修改
+                this.range = AtkRange.Range;                           //修改
             //创建检测范围包围盒
             checkBounds = new Bounds(bounds.center, new Vector3(range, range, range));
         }
@@ -28,6 +28,8 @@ namespace Octree
             base.Start();
             //得到检测范围
             InitRange();
+            //进行第一次检测
+            octreeObject.OctreeComplete.AddListener(UpdateSurroundNode);
         }
         protected override void Update()
         {
@@ -65,10 +67,11 @@ namespace Octree
         {
             //避免残留
             TargetObjects.Clear();
-            
+
             //遍历所有节点，把节点的物体全部加入到集合中
             foreach (var obj in octSet)
             {
+
                 //如果节点未存储物体则跳过
                 if (obj.isEmpty) continue;
 
@@ -78,8 +81,8 @@ namespace Octree
                     TargetObjects.Add(octMono.octMonoObj.gameObject);
                 }
             }
-            
-            return TargetObjects;                                                                    //修改
+
+            return TargetObjects;                                                                    
         }
 
         /// <summary>
@@ -113,6 +116,14 @@ namespace Octree
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireCube(checkBounds.center, checkBounds.size);      //绘制检测范围
+        }
+        
+        protected override void OnDisable()
+        {
+            octreeObject.OctreeComplete.RemoveAllListeners();
+            base.OnDisable();
+            
+
         }
     }
 }

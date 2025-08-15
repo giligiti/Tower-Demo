@@ -50,7 +50,7 @@ namespace Octree
         private void NewNodeInsertInit(OctreeObject otObject)
         {
             allOtObject ??= new HashSet<OctreeObject>();
-            otObject.octree ??= this;
+            otObject.OctreeSystemGet(this);
             allOtObject.Add(otObject);
         }
 

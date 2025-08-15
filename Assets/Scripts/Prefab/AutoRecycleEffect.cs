@@ -14,7 +14,7 @@ public enum ParticleType
 /// <summary>
 /// 自动回收特效方法,挂载在每个需要回收的特效上
 /// </summary>
-public class AutoRecycleEffect : MonoBehaviour
+public class AutoRecycleEffect : MonoBehaviour, IInit
 {
     
 
@@ -34,32 +34,31 @@ public class AutoRecycleEffect : MonoBehaviour
     /// </summary>
     /// <param name="delayTime"></param>
     /// <param name="nowtype"></param>
-    public void Init(string name, float delayTime = 0, int ty = 0)
+    public void Init<T>(T info)where T : InfoData
     {
-        this.particleName = name;
-        ParticleType nowtype;
-        switch (ty)
+        EffInfo Info = info as EffInfo;
+        this.particleName = Info.name;
+        this.delayTime = Info.delayTime;
+        switch (Info.particleType)
         {
             case 0:
-                nowtype = ParticleType.once;
+                this.nowParticleType = ParticleType.once;
                 break;
             case 1:
-                nowtype = ParticleType.duration;
+                this.nowParticleType = ParticleType.duration;
                 break;
             case 2:
-                nowtype = ParticleType.never;
+                this.nowParticleType = ParticleType.never;
                 break;
             default:
-                nowtype = ParticleType.once;
+                this.nowParticleType = ParticleType.once;
                 break;
         }
 
-        nowtype = delayTime == 0 ? ParticleType.once : nowtype;
-        loop = nowtype != ParticleType.once;
+        nowParticleType = delayTime == 0 ? ParticleType.once : nowParticleType;
+        loop = nowParticleType != ParticleType.once;
 
-        this.delayTime = delayTime;
-        this.nowParticleType = nowtype;
-        if (nowtype == ParticleType.never)
+        if (nowParticleType == ParticleType.never)
         {
             mainParticleSystem.Play();
         }

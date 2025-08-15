@@ -15,8 +15,8 @@ TagManager:
   - Monster
   - CanAtk
   - Player
-  - 
-  - 
+  - Bullet
+  - Obstacle
   - 
   - 
   - 

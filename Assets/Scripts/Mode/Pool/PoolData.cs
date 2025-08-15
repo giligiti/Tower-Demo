@@ -60,8 +60,8 @@ public abstract class PoolData
             //实例化
             obj = ObjectInstante(Father.name, path);
         }
-        //取消父对象，直观地显示在层级面板上
-        obj.transform.parent = null;
+        // //取消父对象，直观地显示在层级面板上
+        // obj.transform.parent = null;
         obj.SetActive(true);
         return obj;
     }
@@ -75,7 +75,7 @@ public abstract class PoolData
         obj.SetActive(false);
         poolList.Enqueue(obj);
     }
-    //实例化方法，让子类重写实例化方法，实现实例化的多样性
+    //实例化方法，让子类可以重写实例化方法，实现实例化的多样性
     protected abstract GameObject ObjectInstante(string key,string path = null);
     ////异步实例化方法 
     //protected GameObject ObjecsInstanteAsync(string key)

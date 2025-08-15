@@ -21,8 +21,6 @@ public class Main : MonoBehaviour
     {
         if (isFire)
         {
-            effectFactory.Create(Vector2.zero, Vector3.forward);
-            bulletFactory.Create(0, new Vector3(0, 0, 0), dir);
             isFire = false;
         }
     }

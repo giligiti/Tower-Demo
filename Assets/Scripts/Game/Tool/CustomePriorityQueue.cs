@@ -85,9 +85,9 @@ namespace ToolSpace
         /// <param name="priority"></param>
         public TElement EnqueueDequeue(TElement element, TPriority priority)
         {
-            //加入元素
             Enqueue(element, priority);
-            return Peek();
+            
+            return Dequeue();
         }
         /// <summary>
         /// 查看队首元素
@@ -134,6 +134,7 @@ namespace ToolSpace
             {
                 int parentIndex = Parent(index);
                 PriorityNode<TElement, TPriority> parent = heapList[parentIndex];
+                //进行比较
                 int sort = heapList[index].Priority.CompareTo(parent.Priority);
                 if (sort >= 0) break;
                 //如果比父节点还要小就交换
@@ -158,13 +159,13 @@ namespace ToolSpace
                 int left = LeftChild(index);
                 int right = RightChidld(index);
                 //比较左节点
-                if (left >= length && heapList[left].Priority.CompareTo(heapList[smallest].Priority) < 0)
+                if (left <= length && heapList[left].Priority.CompareTo(heapList[smallest].Priority) < 0)
                 {
                     smallest = left;
                 }
 
                 //比较右节点
-                if (right >= length && heapList[right].Priority.CompareTo(heapList[smallest].Priority) < 0)
+                if (right <= length && heapList[right].Priority.CompareTo(heapList[smallest].Priority) < 0)
                 {
                     smallest = right;
                 }

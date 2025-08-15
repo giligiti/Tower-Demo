@@ -38,6 +38,7 @@ public abstract class BaseHumanoid<T, Y> : MonoBehaviour, IDeath where T : Attac
         controller.enabled = false;
     }
 
+    #region 接口实现内容:IDeath
     /// <summary>
     /// 提供给外界订阅物体死亡事件
     /// </summary>
@@ -49,6 +50,7 @@ public abstract class BaseHumanoid<T, Y> : MonoBehaviour, IDeath where T : Attac
     {
         DeadEvent.RemoveListener(action);
     }
+    #endregion  
 
 }
 //类人生物死亡动画相关
@@ -62,8 +64,8 @@ public interface IHumanoidAnimation
 
     public void StateReset();
 }
-//类人生物生命行为相关
-public interface IHumanoidBehaviour
+//生命行为相关
+public interface ILife
 {
     //受伤方法
     public void HealthDecrease(int damage);

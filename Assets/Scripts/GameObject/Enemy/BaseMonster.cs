@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 //其实是baseZombies
-public class BaseMonster : BaseHumanoid<ZombiesAtk,ZombiesMove>, IHumanoidBehaviour, IInit
+public class BaseMonster : BaseHumanoid<ZombiesAtk,ZombiesMove>, ILife, IInit
 {
     //主脚本负责事件发布和集中注册和注销   
     //攻击事件

@@ -94,6 +94,14 @@ public class MainGrid<T> where T : class, IGridNodes
                 //让节点中的xy值是真实的值
                 p.InitGridNodes(x, y, GridArray[i,j]);
                 p.InitGridScale(gridSize);
+                Collider[] colliders = Physics.OverlapBox
+                 (
+                    obj.transform.position,
+                    new Vector3(gridSize / 2, 0.5f, gridSize / 2),
+                    Quaternion.identity,
+                    LayerMask.GetMask("Obstacle")
+                 );
+                if (colliders.Length > 0) obj.GetComponent<IBecomeWall>().BecomeWall();
                 GridNodesArray[i, j] = p;
 
                 //画线

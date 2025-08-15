@@ -23,7 +23,7 @@ namespace Octree
 
         public Bounds bounds;                                           //定义当前节点管理的 3D 空间范围
         public bool isLeaf => children == null;                         //是否是叶子节点（是否被分割过了）
-        public bool isEmpty => objects == null || objects.Count == 0;   //是否是空叶子节点
+        public bool isEmpty => objects == null || objects.Count == 0;   //是否是空节点
 
         float minNodeSize;
 
@@ -149,11 +149,14 @@ namespace Octree
             if (!draw)
                 return false;
 
-            return draw;
+            //return draw;
+            //画出节点路径
             Gizmos.color = Color.green;
             Gizmos.DrawWireCube(bounds.center, bounds.size);
-            //画出物体实际占据的八叉树网格（红色网格）
+
             return draw;                                                                            //暂时调试
+
+            //画出物体实际占据的八叉树网格（红色网格）
             if (!isLeaf || isEmpty) return draw;
 
             foreach (var item in objects)

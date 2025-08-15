@@ -40,7 +40,7 @@ public class ZombiesAtk : Attacked
             return;
         nowTime = Time.time;
         //调用扣血方法
-        other.GetComponent<IHumanoidBehaviour>().HealthDecrease(atk);
+        other.GetComponent<ILife>().HealthDecrease(atk);
     }
 
     public void ZombiesDead()

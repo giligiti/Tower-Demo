@@ -22,8 +22,7 @@ namespace Octree
             //创建完就销毁
             foreach (var item in worldSpace)
             {
-                item.SetActive(false);
-                //Destroy(item);
+                Destroy(item);
             }
         }
 

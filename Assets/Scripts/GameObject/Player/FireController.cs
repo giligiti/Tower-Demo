@@ -25,7 +25,6 @@ public class FireController : MonoBehaviour
     private void Awake()
     {
         fireOffset = GameDataMgr.Instance.gunInfos[gunID].shootSpeed/60;         //暂时修改 调整射速用
-        Debug.Log(fireOffset);
         cinemachine = Camera.main;   
         startPoint = new Vector2(Screen.width / 2, Screen.height / 2);
     }
@@ -60,9 +59,11 @@ public class FireController : MonoBehaviour
             Vector3 targetPoint = hitInfo.collider != null? hitInfo.point : rayX.GetPoint(100);
             direction = (targetPoint - firePoint.position).normalized;
 
-            GameObject obj = fireEff.Create(firePoint.position,firePoint.transform.forward,0);      //开火特效生成    //要修改
+            GameObject obj = fireEff.Create(firePoint.position,Quaternion.LookRotation(firePoint.transform.forward));      //开火特效生成    //要修改
             obj.transform.SetParent(firePoint);
-            bulletFactory.Create(gunID, firePoint.transform.position, direction);       //子弹生成
+
+            Quaternion q = Quaternion.LookRotation(direction);
+            bulletFactory.Create(firePoint.transform.position, q);       //子弹生成
         }
     }
 }

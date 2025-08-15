@@ -46,3 +46,8 @@ public interface IDeath
     void UnsubscribeDeathEvent(UnityAction action);
 
 }
+
+public interface IIgnore
+{
+    void ToIgnore(GameObject obj);
+}

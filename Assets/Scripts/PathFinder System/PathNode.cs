@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace PathFind
 {
-    public class PathNode : MonoBehaviour, IGridNodes
+    public class PathNode : MonoBehaviour, IGridNodes,IBecomeWall
     {
         [HideInInspector] public PathNode fatherNode;        //记录父节点
         [HideInInspector] public int FCost => HCost + GCost + nodevalue;    //总代价
@@ -31,6 +31,7 @@ namespace PathFind
             Children.color = normalColor;
         }
 
+
         /// <summary>
         /// 网格初始化
         /// </summary>
@@ -45,7 +46,7 @@ namespace PathFind
         }
         public void InitGridScale(int gridSize)
         {
-            transform.localScale = new Vector3(gridSize - 0.1f, gridSize - 0.1f, gridSize - 0.1f);      //调整网格组件大小
+            transform.localScale = new Vector3(gridSize, gridSize, gridSize);      //调整网格组件大小
             text.fontSize = gridSize * 7;                                                               //调整字体大小
 
         }
@@ -83,6 +84,12 @@ namespace PathFind
             return Equals(other as PathNode);
         }
         public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode();
+
+        void IBecomeWall.BecomeWall()
+        {
+            isWall = true;
+            ChangeColor(Color.black);
+        }
     }
     /// <summary>
     /// 节点接口
@@ -98,7 +105,7 @@ namespace PathFind
 
         void ResetNode();
     }
-    
+
     /// <summary>
     /// 路径节点接口
     /// </summary>
@@ -141,6 +148,11 @@ namespace PathFind
         /// </summary>
         void ResetNode();
 
+    }
+
+    public interface IBecomeWall
+    {
+        void BecomeWall();
     }
 }
 

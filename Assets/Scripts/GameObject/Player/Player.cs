@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Player : MonoBehaviour, IHumanoidBehaviour
+public class Player : MonoBehaviour, ILife
 {
     private static Player instance;
     public static Player Instance =>instance;

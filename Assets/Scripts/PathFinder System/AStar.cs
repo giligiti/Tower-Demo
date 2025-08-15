@@ -85,13 +85,12 @@ namespace PathFind
         /// <returns></returns>
         private bool StartPathFind(Stack<PathNode> path)
         {
-            //终点判断是否是障碍物
-            if (EndNode.isWall || StartNode == EndNode)
+            //判断是否是障碍物
+            if (EndNode.isWall || StartNode.isWall || StartNode == EndNode)
                 return false;
 
             GetFinallyPath(StartNode, EndNode);
             //寻路失败
-
             if (EndNode.fatherNode == null && openDictionary.Count == 0) return false;
 
             //寻路成功
@@ -391,6 +390,18 @@ namespace PathFind
             foreach (var node in nodes)
             {
                 node.ResetNode();
+            }
+            openDictionary.Clear();
+            openList.Clear();
+            closedList.Clear();
+        }
+        public void ResetExpectWall()
+        {
+            PathNode[,] nodes = mainGrid.GridNodesArray;
+            foreach (var node in nodes)
+            {
+                if (!node.isWall)
+                    node.ResetNode();
             }
             openDictionary.Clear();
             openList.Clear();

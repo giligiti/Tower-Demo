@@ -9,10 +9,16 @@ namespace Octree
         [HideInInspector] public Bounds bounds;                               //自身的包围盒
         
         protected Vector3 lastPosition = new Vector3();
+        public bool isDead = false;
+
+        //临时调试                                                              //调试
+        public Vector3 turePosition => (transform.position + offset);
+        private Vector3 offset = Vector3.zero;
+
 
         private void Awake()
         {
-            
+            TryGetIDeath();
         }
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         protected virtual void Start()
@@ -36,10 +42,15 @@ namespace Octree
         {
             //创建物体自身包围盒
             CharacterController c = GetComponentInChildren<CharacterController>();
+
             if (c != null)
+            {
                 bounds = c.bounds;
-            else
-                bounds = GetComponent<Collider>().bounds;
+                offset = Vector3.up;
+            }
+
+            else bounds = GetComponent<Collider>().bounds;
+                
 
             //创建相应的OctreeObject
             octreeObject = new OctreeObject(bounds, this);
@@ -54,7 +65,7 @@ namespace Octree
         private void CheckPositionChange()
         {
             //当位置发生变动
-            if (transform.position != lastPosition)
+            if (transform.position != lastPosition && !isDead)
             {
                 lastPosition = transform.position;
                 //改变包围盒位置
@@ -67,18 +78,33 @@ namespace Octree
             }
         }
 
+        protected virtual void TryGetIDeath()
+        {
+            if (TryGetComponent<IDeath>(out IDeath death))
+            {
+                death.SubscribeDeathEvent(Dead);
+            }
+        }
+        /// <summary>
+        /// 辅助函数
+        /// </summary>
+        private void Dead()
+        {
+            Debug.Log("dead");
+            octreeObject.BreakParent(true);
+            isDead = true;
+        }
+
         protected virtual void OnDrawGizmos()
         {
             //Gizmos.DrawWireCube(bounds.center, bounds.size);//    表示实际占据空间
         }
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
-            //Debug.Log(gameObject.name);
-            //octreeObject.BreakParent();
-        }
-        private void OnDestroy()
-        {
-            octreeObject.BreakParent();
+            Debug.Log($"{gameObject.name} 的 OnDisable 被调用！组件是否启用：{enabled}，对象是否激活：{gameObject.activeSelf}", this);
+            octreeObject.BreakParent(true);
+            octreeObject = null;
+            isDead = false;
         }
     }
 }

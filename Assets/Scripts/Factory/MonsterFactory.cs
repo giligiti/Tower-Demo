@@ -7,7 +7,7 @@ public class MonsterFactory : BaseFactory, IFactory
     {
         MonsterInfo info = GameDataMgr.Instance.monsterInfos[infoID];
         GameObject obj = PoolMgr.Instance.GetObject<MonsterPoolData>(info.name);
-        IInit b = obj.GetComponent<IInit>();
+        IInit b = obj.GetComponent<IInit>();                                      //ÁÙÊ±ÐÞ¸Ä
 
         obj.transform.position = position;
         obj.transform.rotation = quaternion;

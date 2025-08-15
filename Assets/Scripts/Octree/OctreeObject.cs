@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Octree
 {
@@ -14,12 +15,21 @@ namespace Octree
 
         public OctreeMono octMonoObj;                                           //表示这个OctreeObject真正关联的物体//用于八叉树查询
 
-
+        public UnityEvent OctreeComplete = new UnityEvent();                           
 
         public OctreeObject(Bounds obj, OctreeMono mono)
         {
             ChangeBounds(obj);
             this.octMonoObj = mono;
+        }
+
+        /// <summary>
+        /// 得到所属的八叉树了
+        /// </summary>
+        public void OctreeSystemGet(Octree octree)
+        {
+            this.octree = octree;
+            OctreeComplete?.Invoke();
         }
 
         public void ChangeBounds(Bounds obj) => this.bounds = obj;
@@ -45,7 +55,7 @@ namespace Octree
         public void OctreeUpdate()
         {
             //断开旧关联
-            BreakParent();
+            BreakParent(false);
             
             octree.ReDivide(this);
         }
@@ -53,14 +63,16 @@ namespace Octree
         /// <summary>
         /// 关联的物体销毁或者失活的时候
         /// </summary>
-        public void BreakParent()
+        /// <param name="isbreakAll">是否不再加入八叉树</param>
+        public void BreakParent(bool isbreakAll)
         {
             //断开旧关联
             if (parents.Count > 0)
             {
                 foreach (OctreeNode node in parents)
                 {
-                    node.RemoveObject(this);
+                    if (isbreakAll) node.RemoveObject(this);
+                    if (!Intersects(node.bounds)) node.RemoveObject(this);
                 }
                 parents.Clear();
             }
