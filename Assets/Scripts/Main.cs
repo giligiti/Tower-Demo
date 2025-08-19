@@ -14,6 +14,7 @@ public class Main : MonoBehaviour
     {
         GameObject obj = bruteFactory.Create(Vector3.zero, Quaternion.identity);
         //eff = effectFactory.Create(Vector2.zero, Vector3.forward);
+
     }
 
     // Update is called once per frame

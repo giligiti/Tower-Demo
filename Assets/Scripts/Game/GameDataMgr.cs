@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Octree;
 using UnityEngine;
@@ -11,8 +12,9 @@ public class GameDataMgr : BaseManager<GameDataMgr>
     public List<EffInfo> effDatas = new List<EffInfo>();
 
     public List<GunInfo> gunInfos = new List<GunInfo>();
-
+    //八叉树注册物体
     public HashSet<OctreeObject> octreeMonos = new HashSet<OctreeObject>();
+
     private GameDataMgr()
     {
         monsterInfos = JsonMgr.Instance.LoadData<List<MonsterInfo>>("MonsterInfo");
@@ -22,11 +24,7 @@ public class GameDataMgr : BaseManager<GameDataMgr>
         effDatas = JsonMgr.Instance.LoadData<List<EffInfo>>("EffInfo");
 
         gunInfos = JsonMgr.Instance.LoadData<List<GunInfo>>("GunInfo");
+
     }
-    
-
-    
-
-
 
 }

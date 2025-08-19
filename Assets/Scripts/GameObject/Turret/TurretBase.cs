@@ -133,7 +133,7 @@ public class TurretBase : MonoBehaviour, IInit, IGetRange
             if ((layer & layerNum) != 0)
             {
                 targetMono = obj.GetComponent<OctreeMono>();                                      //修改
-                if (!TargetKeep(targetMono.turePosition, out float distance)) continue;
+                if (!TargetKeep(targetMono.bounds.center, out float distance)) continue;
                 //选择符合要求的物体中的，距离最近的
                 if (distance < resverPair.Item2) resverPair = (obj, distance);
             }
@@ -192,7 +192,7 @@ public class TurretBase : MonoBehaviour, IInit, IGetRange
     private void AtkFlow()
     {
         //检验目标，并计算出炮塔的旋转，赋值给Xturn和Yturn，用于下面旋转的参数获取，此处distance无用
-        if (!TargetKeep(targetMono.turePosition, out float distance))                       //修改
+        if (!TargetKeep(targetMono.bounds.center, out float distance))                       //修改
         {
             TargetChange(null);
             return;

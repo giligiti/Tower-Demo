@@ -50,7 +50,7 @@ public class TurretBaseAttack : Attacked
     public void StartFire(OctreeMono target)               //要修改
     {
         //targetObj = target;
-        float angle = Vector3.Angle(fireObj.transform.forward, target.turePosition - fireObj.transform.position);
+        float angle = Vector3.Angle(fireObj.forward, target.bounds.center - fireObj.position);
         if (angle < aimAccuracy)
         {
             if (Time.time - nowTime > FireTime)

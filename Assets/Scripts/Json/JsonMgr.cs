@@ -1,4 +1,5 @@
 ﻿using LitJson;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -56,6 +57,17 @@ public class JsonMgr
         //如果读写文件夹中都还没有 那就返回一个默认对象
         if (!File.Exists(path))
             return new T();
+
+        JsonMapper.RegisterImporter<string, E_SoundType>(str =>
+        {
+            // 将字符串解析为对应的枚举成员（忽略大小写可以加true，如Enum.Parse(type, str, true)）
+            return (E_SoundType)Enum.Parse(typeof(E_SoundType), str);
+        });
+        // 注册：枚举 -> 字符串（序列化时用，可选）
+        JsonMapper.RegisterExporter<E_SoundType>((enumValue, writer) =>
+        {
+            writer.Write(enumValue.ToString());
+        });
 
         //进行反序列化
         string jsonStr = File.ReadAllText(path);

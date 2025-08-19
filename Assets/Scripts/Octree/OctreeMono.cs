@@ -11,11 +11,6 @@ namespace Octree
         protected Vector3 lastPosition = new Vector3();
         public bool isDead = false;
 
-        //临时调试                                                              //调试
-        public Vector3 turePosition => (transform.position + offset);
-        private Vector3 offset = Vector3.zero;
-
-
         private void Awake()
         {
             TryGetIDeath();
@@ -45,8 +40,8 @@ namespace Octree
 
             if (c != null)
             {
-                bounds = c.bounds;
-                offset = Vector3.up;
+                bounds = new Bounds();
+                bounds.Encapsulate(c.bounds);
             }
 
             else bounds = GetComponent<Collider>().bounds;
@@ -86,7 +81,7 @@ namespace Octree
             }
         }
         /// <summary>
-        /// 辅助函数
+        /// 辅助函数，死亡后脱离八叉树系统
         /// </summary>
         private void Dead()
         {

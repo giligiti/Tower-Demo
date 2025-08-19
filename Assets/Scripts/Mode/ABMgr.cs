@@ -38,7 +38,7 @@ public class ABMgr : BaseManager<ABMgr>
         }
     }
 
-    private void LoadBundle(string name)
+    private void LoadBundle(string abName)
     {
         if (mainBundle == null)
         {
@@ -49,7 +49,7 @@ public class ABMgr : BaseManager<ABMgr>
         {
             Debug.Log("nono");
         }
-        string[] bundles = manifest.GetAllDependencies(name);//根据传入的名字得到包的依赖包的名字
+        string[] bundles = manifest.GetAllDependencies(abName);//根据传入的名字得到包的依赖包的名字
         AssetBundle build;
         //加载所有依赖包
         for (int i = 0; i < bundles.Length; i++)
@@ -63,25 +63,25 @@ public class ABMgr : BaseManager<ABMgr>
         }
 
         //加载包
-        if (!abDic.ContainsKey(name))//判断是否加载过
+        if (!abDic.ContainsKey(abName))//判断是否加载过
         {
-            build = AssetBundle.LoadFromFile(name);
-            abDic.Add(name, build);
+            build = AssetBundle.LoadFromFile(abName);
+            abDic.Add(abName, build);
         }
     }
     #region 同步加载
     //指定类型方法
-    public Object LoadRes(string name, string resName,Type types)
+    public Object LoadRes(string abName, string resName,Type types)
     {
-        LoadBundle(name);
-        Object obj = abDic[name].LoadAsset(resName , types);
+        LoadBundle(abName);
+        Object obj = abDic[abName].LoadAsset(resName , types);
         return obj;
     }
     //泛型方法
-    public T LoadRes<T>(string name, string resName) where T : Object
+    public T LoadRes<T>(string abName, string resName) where T : Object
     {
-        LoadBundle(name);
-        T obj = abDic[name].LoadAsset<T>(resName);
+        LoadBundle(abName);
+        T obj = abDic[abName].LoadAsset<T>(resName);
         return obj;
     }
 
@@ -89,15 +89,14 @@ public class ABMgr : BaseManager<ABMgr>
 
     #region 异步加载
     //异步加载传入ab包名，资源名，类型名，回调事件
-    public void LoadResAsync(string name, string resName, Type types, UnityAction<Object> events = null)
+    public void LoadResAsync(string abName, string resName, Type types, UnityAction<Object> events = null)
     {
-        
-        MonoMgr.Instance.StartCoroutine(RealLoadRes(name, resName, types, events));
+        MonoMgr.Instance.StartCoroutine(RealLoadRes(abName, resName, types, events));
     }
     //泛型异步
-    public void LoadResAsync<T>(string name, string resName, UnityAction<T> events = null)where T : Object
+    public void LoadResAsync<T>(string abName, string resName, UnityAction<T> events = null)where T : Object
     {
-        MonoMgr.Instance.StartCoroutine(RealLoadRes<T>(name, resName, events));
+        MonoMgr.Instance.StartCoroutine(RealLoadRes<T>(abName, resName, events));
     }
     //协程
     private IEnumerator RealLoadRes(string name, string resName, Type type, UnityAction<Object> events = null)
