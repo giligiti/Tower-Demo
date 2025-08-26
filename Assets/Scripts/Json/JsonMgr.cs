@@ -58,13 +58,13 @@ public class JsonMgr
         if (!File.Exists(path))
             return new T();
 
-        JsonMapper.RegisterImporter<string, E_SoundType>(str =>
+        JsonMapper.RegisterImporter<string, E_SoundClip>(str =>
         {
             // 将字符串解析为对应的枚举成员（忽略大小写可以加true，如Enum.Parse(type, str, true)）
-            return (E_SoundType)Enum.Parse(typeof(E_SoundType), str);
+            return (E_SoundClip)Enum.Parse(typeof(E_SoundClip), str);
         });
         // 注册：枚举 -> 字符串（序列化时用，可选）
-        JsonMapper.RegisterExporter<E_SoundType>((enumValue, writer) =>
+        JsonMapper.RegisterExporter<E_SoundClip>((enumValue, writer) =>
         {
             writer.Write(enumValue.ToString());
         });

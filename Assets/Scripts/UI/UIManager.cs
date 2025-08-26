@@ -7,16 +7,20 @@ public class UIManager : BaseManager<UIManager>
     //存储当前显示的面板
     private Dictionary<string, BasePanel> panelDic = new Dictionary<string, BasePanel>();
     private GameObject canvas;
+    public GameObject Canvas => canvas;
 
     private UIManager()
     {
-        canvas = GameObject.Instantiate(Resources.Load<GameObject>("UI/canvas"));
-        GameObject.DontDestroyOnLoad(canvas);
+        if (canvas == null)
+        {
+            canvas = GameObject.Instantiate(Resources.Load<GameObject>("UI/canvas"));
+        }
     }
 
     //显示面板//创建面板并且返回面板
     public T ShowPanel<T>() where T : BasePanel
     {
+        
         string name = typeof(T).Name;
         //检查是否已经存在
         if (panelDic.TryGetValue(typeof(T).Name, out var value))

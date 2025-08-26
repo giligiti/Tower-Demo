@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 using UnityEngine;
-//×ÓÀàÒªÏÔÊ¾ÊµÏÖË½ÓĞ¹¹Ôìº¯Êı
+//å­ç±»è¦æ˜¾ç¤ºå®ç°ç§æœ‰æ„é€ å‡½æ•°
 public class BaseManager<T>  where T :class  
 {
     private static T instance;
@@ -20,7 +20,7 @@ public class BaseManager<T>  where T :class
                         ConstructorInfo info = t.GetConstructor(BindingFlags.Instance|BindingFlags.NonPublic,null,Type.EmptyTypes,null);
                         if (info != null)
                             instance = info.Invoke(null) as T;
-                        else throw new ArgumentException("´íÎó£¬µ¥Àı×ÓÀàÎ´ÊµÏÖË½ÓĞ¹¹Ôìº¯Êı",nameof(info));
+                        else throw new ArgumentException("é”™è¯¯ï¼Œå•ä¾‹å­ç±»æœªå®ç°ç§æœ‰æ„é€ å‡½æ•°",nameof(info));
                     }
                 }
             }

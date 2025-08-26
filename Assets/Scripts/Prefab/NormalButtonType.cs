@@ -3,12 +3,12 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class ButtonSound : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPointerDownHandler,IPointerUpHandler
+public class NormalButtonType : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPointerDownHandler,IPointerUpHandler
 {
     //按下声音
-    public E_SoundType buttonSoundType = E_SoundType.ui_Button;
+    public E_SoundClip buttonSoundType = E_SoundClip.ui_Button;
     //指向声音
-    public E_SoundType buttonPointSoundType = E_SoundType.ui_PointButton;
+    public E_SoundClip buttonPointSoundType = E_SoundClip.ui_PointButton;
 
     #region  缓动效果
 
@@ -24,10 +24,10 @@ public class ButtonSound : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private bool isPressing = false;
 
 
-    [Tooltip("鼠标悬停放大倍数")]
+    //鼠标悬停放大倍数
     private float hoverScale = 1.1f;
-    [Tooltip("鼠标按下缩小倍数")]
-    private float pressScale = 0.9f;
+    //鼠标按下缩小倍数
+     private float pressScale = 0.9f;
     [Tooltip("表示动画播放时间")]
     public float duration = 0.2f;
     //表示原始缩放
@@ -54,7 +54,6 @@ public class ButtonSound : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         //播放声音
         SoundMgr.Instance.PlayUISound(buttonPointSoundType);
-        Debug.Log(gameObject.name + " " + eventData.pointerId);
         //放大button
         isHovering = true;
         if (!isPressing) PlayTweenAnimation(hoverScale, point);
@@ -84,7 +83,7 @@ public class ButtonSound : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             currentTween.Kill();
         }
-        
+
         currentTween = transform.DOScale(targetScale * originScale, duration).SetEase(easeType).SetUpdate(true);
 
     }

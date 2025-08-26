@@ -2,25 +2,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-//Ìí¼ÓÊÂ¼ş¼àÌı£ºAddEventListener
-//×¢²áÊÂ¼ş£ºµ÷ÓÃ·½·¨ĞèÒª´«Èë´øÓĞÒ»¸öobj²ÎÊıÒıÓÃµÄº¯Êı£¬objÊÇÊÂ¼ş´¥·¢Õß£¬ÓÃÓÚÅĞ¶ÏÊÂ¼ş´¥·¢ÕßµÄÉí·İ
-//ÊÂ¼ş´¥·¢£ºTriggerEventListener
-//ÊÂ¼ş·¢Éú£º´¥·¢ÊÂ¼şĞèÒª´«ÈëÊÂ¼ş´¥·¢Õß±¾Éí»òÕßÏàÓ¦½Å±¾
+//æ·»åŠ äº‹ä»¶ç›‘å¬ï¼šAddEventListener
+//æ³¨å†Œäº‹ä»¶ï¼šè°ƒç”¨æ–¹æ³•éœ€è¦ä¼ å…¥å¸¦æœ‰ä¸€ä¸ªobjå‚æ•°å¼•ç”¨çš„å‡½æ•°ï¼Œobjæ˜¯äº‹ä»¶è§¦å‘è€…ï¼Œç”¨äºåˆ¤æ–­äº‹ä»¶è§¦å‘è€…çš„èº«ä»½
+//äº‹ä»¶è§¦å‘ï¼šTriggerEventListener
+//äº‹ä»¶å‘ç”Ÿï¼šè§¦å‘äº‹ä»¶éœ€è¦ä¼ å…¥äº‹ä»¶è§¦å‘è€…æœ¬èº«æˆ–è€…ç›¸åº”è„šæœ¬
 public class EventCenter :BaseManager<EventCenter>
 {
     private EventCenter()
     {
 
     }
-    //ÊÂ¼şÈİÆ÷
-    //ĞèÒª´«ÈëÊÂ¼ş´¥·¢Õß±¾Éí
+    //äº‹ä»¶å®¹å™¨
+    //éœ€è¦ä¼ å…¥äº‹ä»¶è§¦å‘è€…æœ¬èº«
     private Dictionary<string, UnityAction<Object>> eventDic = new Dictionary<string, UnityAction<Object>>();
-    //²»ĞèÒª´«ÈëÊÂ¼ş´¥·¢Õß±¾Éí
+    //ä¸éœ€è¦ä¼ å…¥äº‹ä»¶è§¦å‘è€…æœ¬èº«
     private Dictionary<string,UnityAction> eventNop = new Dictionary<string, UnityAction>();
 
-    #region ĞèÒª´«ÈëÊÂ¼ş´¥·¢Õß±¾ÉíµÄ¼àÌıºÍ×¢Ïú·½·¨
+    #region éœ€è¦ä¼ å…¥äº‹ä»¶è§¦å‘è€…æœ¬èº«çš„ç›‘å¬å’Œæ³¨é”€æ–¹æ³•
 
-    //ÊÂ¼ş×¢²á
+    //äº‹ä»¶æ³¨å†Œ
     public void AddEventListener(string name, UnityAction<Object> events)
     {
         if (eventDic.ContainsKey(name))
@@ -33,7 +33,7 @@ public class EventCenter :BaseManager<EventCenter>
         }
     }
 
-    //ÊÂ¼ş´¥·¢
+    //äº‹ä»¶è§¦å‘
     public void TriggerEventListener(string name , Object obj = null)
     {
         if (!eventDic.ContainsKey(name))
@@ -43,11 +43,11 @@ public class EventCenter :BaseManager<EventCenter>
 
     #endregion
 
-    #region ²»ĞèÒª´«ÈëÊÂ¼ş´¥·¢Õß±¾ÉíµÄ¼àÌı×¢Ïú·½·¨ÖØÔØ
+    #region ä¸éœ€è¦ä¼ å…¥äº‹ä»¶è§¦å‘è€…æœ¬èº«çš„ç›‘å¬æ³¨é”€æ–¹æ³•é‡è½½
 
-    //ÊÂ¼ş¼àÌı´¥·¢·½·¨ÖØÔØ
+    //äº‹ä»¶ç›‘å¬è§¦å‘æ–¹æ³•é‡è½½
 
-    //ÊÂ¼ş×¢²á
+    //äº‹ä»¶æ³¨å†Œ
     public void AddEventListener(string name, UnityAction events)
     {
         if (eventDic.ContainsKey(name))
@@ -59,7 +59,7 @@ public class EventCenter :BaseManager<EventCenter>
             eventNop.Add(name, events);
         }
     }
-    //ÊÂ¼ş´¥·¢
+    //äº‹ä»¶è§¦å‘
     public void TriggerEventListener(string name)
     {
         if (!eventNop.ContainsKey(name))
@@ -68,10 +68,11 @@ public class EventCenter :BaseManager<EventCenter>
     }
 
     #endregion
-    //ÓÃÓÚ¼ÓÔØ³¡¾°Ê±Çå¿ÕÊÂ¼şÖĞĞÄ£¬·ÀÖ¹ÄÚ´æĞ¹Â¶
+    //ç”¨äºåŠ è½½åœºæ™¯æ—¶æ¸…ç©ºäº‹ä»¶ä¸­å¿ƒï¼Œé˜²æ­¢å†…å­˜æ³„éœ²
     public void ClearEventCenter()
     {
         eventDic.Clear();
+        eventNop.Clear();
     }
 
 }

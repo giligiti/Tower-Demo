@@ -13,15 +13,21 @@ public class SoundMgr : MonoBehaviour
     //存储在挂载在物体上的音效播放器
     private HashSet<AudioSource> setObjAudio = new HashSet<AudioSource>();
     //存储加载出来的音乐:背景音乐，UI音效等
-    private Dictionary<E_SoundType, AudioClip> dicAudio = new Dictionary<E_SoundType, AudioClip>();
+    private Dictionary<E_SoundClip, AudioClip> dicAudio = new Dictionary<E_SoundClip, AudioClip>();
     //存储加载出来的音乐的路径
     List<SoundInfo> soundDatas = new List<SoundInfo>();
-
-    public MusicData musicData;
+    //通过加载得到的全局声音数据
+    private MusicData musicData;
+    public MusicData MusicData => musicData;
+    //对象池加载声音物体的数量
+    private int soundObjNum = 10;
 
     void Awake()
     {
         instance = this;
+        //对象池预加载
+        PoolMgr.Instance.AdvanceInstantite<AutoRecycleSound, SoundPoolData>(soundObjNum);
+
         audioSource = this.gameObject.AddComponent<AudioSource>();//BGM
         soundSource = this.gameObject.AddComponent<AudioSource>();//音效
         setObjAudio.Add(soundSource);
@@ -35,8 +41,8 @@ public class SoundMgr : MonoBehaviour
         SetMusicVolume(musicData.musicValue);
         SoundMute(musicData.soundMute);
         MusicMute(musicData.musicMute);
+        
         //背景音乐开始播放
-        BGMChange(E_SoundType.bgm_Normal);
         audioSource.loop = true;
     }
     #region SoundPlayer相关
@@ -83,7 +89,7 @@ public class SoundMgr : MonoBehaviour
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    private AudioClip GetAudio(E_SoundType type)
+    private AudioClip GetAudio(E_SoundClip type)
     {
         //加载对应音效
         AudioClip clip = null;
@@ -106,12 +112,12 @@ public class SoundMgr : MonoBehaviour
 
     #endregion
 
-    #region 播放声音
+    #region 播放声音    
     /// <summary>
     /// 播放BGM
     /// </summary>
     /// <param name="type"></param>
-    public void BGMChange(E_SoundType type)
+    public void PlayBGMSound(E_SoundClip type)
     {
         audioSource.Stop();
         AudioClip clip = GetAudio(type);
@@ -125,44 +131,44 @@ public class SoundMgr : MonoBehaviour
     /// 全局播放（UI）
     /// </summary>
     /// <param name="type"></param>
-    public void PlayUISound(E_SoundType type)
+    public void PlayUISound(E_SoundClip type)
     {
         soundSource.PlayOneShot(GetAudio(type));
     }
-
+    //为固定挂载Audiosource组件提供音频资源（主要是只播放一个音频，自由控制音频启停的声音组件）
     /// <summary>
     ///  固定3D物体的音频资源获取
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public AudioClip GetObjSound(E_SoundType type)
+    public AudioClip GetPlayerSound(AudioSource audio, E_SoundClip type)
     {
         return GetAudio(type);
+    }
+    public void StopPlayerSound()
+    {
+
     }
 
     /// <summary>
     /// 物体音效播放
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="position"></param>
-    public void PlaySoundObj(E_SoundType type, Vector3 position)
+    /// <param name="type">具体声音</param>
+    /// <param name="position">位置</param>
+    /// <param name="pitch">声音起伏幅度</param>
+    public void PlaySoundObj(E_SoundClip type, Vector3 position, float pitch = 0)
     {
-        GameObject obj = PoolMgr.Instance.GetObject<SoundPoolData>("soundObj");
+        GameObject obj = PoolMgr.Instance.GetObject<SoundPoolData>("SoundObj");
         //设置物体
         obj.transform.position = position;
-
         //进行初始化：音效同步，声音起伏;音效组件的初始化在自身挂载的脚本中,设置为不循环、3d音效播放
         AutoRecycleSound atSound = obj.GetComponent<AutoRecycleSound>();
-        atSound.ad.volume = musicData.soundValue;
-        atSound.ad.mute = musicData.soundMute;
-
         //声音起伏
-        atSound.DisturbanceVoice();
-
+        atSound.DisturbanceVoice(pitch);
         //加载对应音效
         AudioClip clip = GetAudio(type);
         //播放
-        atSound.ad.PlayOneShot(clip);
+        atSound.PlaySoundOnObj(musicData.soundValue, musicData.soundMute, clip);
     }
 
 
@@ -226,7 +232,7 @@ public class SoundMgr : MonoBehaviour
 /// <summary>
 /// 表示具体音效资源
 /// </summary>
-public enum E_SoundType
+public enum E_SoundClip
 {
     //BGM
     bgm_Normal,//平常bgm

@@ -3,16 +3,16 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// ÌØĞ§ÀàĞÍ
+/// ç‰¹æ•ˆç±»å‹
 /// </summary>
 public enum ParticleType
 {
-    once,           //Ö»²¥·ÅÒ»´Î
-    duration,       //²¥·ÅÖ¸¶¨Ê±¼ä
-    never,          //Ò»Ö±²»»áÏûÊ§
+    once,           //åªæ’­æ”¾ä¸€æ¬¡
+    duration,       //æ’­æ”¾æŒ‡å®šæ—¶é—´
+    never,          //ä¸€ç›´ä¸ä¼šæ¶ˆå¤±
 }
 /// <summary>
-/// ×Ô¶¯»ØÊÕÌØĞ§·½·¨,¹ÒÔØÔÚÃ¿¸öĞèÒª»ØÊÕµÄÌØĞ§ÉÏ
+/// è‡ªåŠ¨å›æ”¶ç‰¹æ•ˆæ–¹æ³•,æŒ‚è½½åœ¨æ¯ä¸ªéœ€è¦å›æ”¶çš„ç‰¹æ•ˆä¸Š
 /// </summary>
 public class AutoRecycleEffect : MonoBehaviour, IInit
 {
@@ -21,16 +21,16 @@ public class AutoRecycleEffect : MonoBehaviour, IInit
     private ParticleType nowParticleType = ParticleType.once;
 
     private ParticleSystem[] particleSystems;
-    private ParticleSystem mainParticleSystem;  //Ö÷ÌØĞ§
-    private string particleName;                //ÌØĞ§Ãû
-    private bool loop = false;                  //ÊÇ·ñÑ­»·
-    private float delayTime;                    //ÏëÒªÌØĞ§³ÖĞøµÄÊ±¼ä
-    private float releaseDelayTime = 0.1f;      //µ¹¼ÆÊ±½áÊøºóÑÓ³Ù»ØÊÕµÄÊ±¼ä
+    private ParticleSystem mainParticleSystem;  //ä¸»ç‰¹æ•ˆ
+    private string particleName;                //ç‰¹æ•ˆå
+    private bool loop = false;                  //æ˜¯å¦å¾ªç¯
+    private float delayTime;                    //æƒ³è¦ç‰¹æ•ˆæŒç»­çš„æ—¶é—´
+    private float releaseDelayTime = 0.1f;      //å€’è®¡æ—¶ç»“æŸåå»¶è¿Ÿå›æ”¶çš„æ—¶é—´
 
     private UnityEvent startEvent = new UnityEvent();
 
     /// <summary>
-    /// ÌØĞ§³õÊ¼»¯£¬³õÊ¼»¯ºó²Å»á¿ªÊ¼²¥·Å
+    /// ç‰¹æ•ˆåˆå§‹åŒ–ï¼Œåˆå§‹åŒ–åæ‰ä¼šå¼€å§‹æ’­æ”¾
     /// </summary>
     /// <param name="delayTime"></param>
     /// <param name="nowtype"></param>
@@ -64,21 +64,21 @@ public class AutoRecycleEffect : MonoBehaviour, IInit
         }
         else
         {
-            //³õÊ¼»¯Íê³Éºó²Å¿ªÊ¼²¥·Å
+            //åˆå§‹åŒ–å®Œæˆåæ‰å¼€å§‹æ’­æ”¾
             startEvent.Invoke();
         }
     }
     private void Awake()
     {
-        //»ñµÃ×Ô¼ºÒÔ¼°×ÓÎïÌåÉíÉÏµÄËùÓĞÁ£×ÓÏµÍ³
+        //è·å¾—è‡ªå·±ä»¥åŠå­ç‰©ä½“èº«ä¸Šçš„æ‰€æœ‰ç²’å­ç³»ç»Ÿ
         mainParticleSystem = GetComponent<ParticleSystem>();
         particleSystems = GetComponentsInChildren<ParticleSystem>(false);
     }
     private void OnEnable()
     {
-        mainParticleSystem.Stop();//Ò»¿ªÊ¼ÏÈÔİÍ£²¥·Å
-        RestartonEnable();        //ÏÈÖØÖÃ
-        startEvent.AddListener(AfterInit);//Ìí¼ÓÊÂ¼şµÈ´ı³õÊ¼»¯Íê³É
+        mainParticleSystem.Stop();//ä¸€å¼€å§‹å…ˆæš‚åœæ’­æ”¾
+        RestartonEnable();        //å…ˆé‡ç½®
+        startEvent.AddListener(AfterInit);//æ·»åŠ äº‹ä»¶ç­‰å¾…åˆå§‹åŒ–å®Œæˆ
     }
     private void OnDisable()
     {
@@ -87,7 +87,7 @@ public class AutoRecycleEffect : MonoBehaviour, IInit
     private void AfterInit()
     {
         float time;
-        mainParticleSystem.Play();//¼¤»îºó¿ªÊ¼²¥·Å
+        mainParticleSystem.Play();//æ¿€æ´»åå¼€å§‹æ’­æ”¾
         if (nowParticleType == ParticleType.once)
         {
             time = CalculateTotalDuration();
@@ -97,7 +97,7 @@ public class AutoRecycleEffect : MonoBehaviour, IInit
             time = delayTime;
         }
 
-        StartCoroutine(PushParticleBack(time));//¿ªÆôĞ­³Ì
+        StartCoroutine(PushParticleBack(time));//å¼€å¯åç¨‹
     }
     IEnumerator PushParticleBack(float lifetime)
     {
@@ -107,11 +107,11 @@ public class AutoRecycleEffect : MonoBehaviour, IInit
         PoolMgr.Instance.PushObject<EffectsPoolData>(particleName, this.gameObject);
     }
 
-    // ¼ÆËãËùÓĞÁ£×ÓÏµÍ³µÄ×î´ó³ÖĞøÊ±¼ä
+    // è®¡ç®—æ‰€æœ‰ç²’å­ç³»ç»Ÿçš„æœ€å¤§æŒç»­æ—¶é—´
     private float CalculateTotalDuration()
     {
         float totalDuration = 0;
-        // ¼ÆËãËùÓĞÁ£×ÓÏµÍ³µÄ×î´ó³ÖĞøÊ±¼ä
+        // è®¡ç®—æ‰€æœ‰ç²’å­ç³»ç»Ÿçš„æœ€å¤§æŒç»­æ—¶é—´
         if (particleSystems != null && nowParticleType == ParticleType.once)
         {
             foreach (ParticleSystem ps in particleSystems)
@@ -125,13 +125,13 @@ public class AutoRecycleEffect : MonoBehaviour, IInit
         return totalDuration;
     }
 
-    #region ÖØÖÃÏà¹Ø
+    #region é‡ç½®ç›¸å…³
 
     private void RestartonEnable()
     {
         if (mainParticleSystem == null)
         {
-            Debug.Log("´íÎó£¬Î´ÕÒµ½Á£×ÓÏµÍ³");
+            Debug.Log("é”™è¯¯ï¼Œæœªæ‰¾åˆ°ç²’å­ç³»ç»Ÿ");
             return;
         }
 
@@ -140,7 +140,7 @@ public class AutoRecycleEffect : MonoBehaviour, IInit
             return;
         foreach (ParticleSystem ps in particleSystems)
         {
-            //Í£Ö¹²¢Çå³ı×ÓÁ£×Ó
+            //åœæ­¢å¹¶æ¸…é™¤å­ç²’å­
             RestartParticleSystem(ps);
         }
     }
@@ -150,7 +150,7 @@ public class AutoRecycleEffect : MonoBehaviour, IInit
         
         ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         ps.Simulate(0,false,false);
-        //ÖØÖÃËæ»úÖÖ×Ó
+        //é‡ç½®éšæœºç§å­
         //if (ps.useAutoRandomSeed)
         //{
         //    ps.randomSeed = (uint)Random.Range(1,int.MaxValue);

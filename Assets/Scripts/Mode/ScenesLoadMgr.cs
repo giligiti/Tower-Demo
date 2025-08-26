@@ -2,43 +2,64 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-//¼¯ÖĞÔÚ´Ë´¦´¦Àí³¡¾°¼ÓÔØÏà¹Ø·½·¨ºÍÊÂ¼ş
+//é›†ä¸­åœ¨æ­¤å¤„å¤„ç†åœºæ™¯åŠ è½½ç›¸å…³æ–¹æ³•å’Œäº‹ä»¶
 public class ScenesLoadMgr : BaseManager<ScenesLoadMgr>
 {
+    public UnityEvent FrontEvent = new UnityEvent();
+    public UnityEvent BackEvent = new UnityEvent();
+    public UnityEvent<float> LoadingEvent = new UnityEvent<float>();
     private ScenesLoadMgr()
     {
 
     }
-    //Ìá¹©¸øÍâ²¿½øĞĞ³¡¾°¼ÓÔØ
+
+    //æä¾›ç»™å¤–éƒ¨è¿›è¡Œåœºæ™¯åŠ è½½
     public void LoadScene(string name, UnityAction fun = null)
     {
-        //°´ĞèÇóÌí¼ÓÕâ¸öÊÂ¼şÖĞĞÄ´¥·¢·½·¨
-        EventCenter.Instance.TriggerEventListener(name);
-        //¼ÓÔØ³¡¾°ĞèÒªÇå¿ÕÊÂ¼şÖĞĞÄ
-        EventCenter.Instance.ClearEventCenter();
+        // //æŒ‰éœ€æ±‚æ·»åŠ è¿™ä¸ªäº‹ä»¶ä¸­å¿ƒè§¦å‘æ–¹æ³•
+        // EventCenter.Instance.TriggerEventListener(name);
+        // //åŠ è½½åœºæ™¯éœ€è¦æ¸…ç©ºäº‹ä»¶ä¸­å¿ƒ
+        // EventCenter.Instance.ClearEventCenter();
+
+        FrontEvent?.Invoke();
 
         SceneManager.LoadScene(name);
-        
-        //´¥·¢´«ÈëµÄ·½·¨
+
+        BackEvent?.Invoke();
+
+        //è§¦å‘ä¼ å…¥çš„æ–¹æ³•
         fun?.Invoke();
+        //RemoveListenerFunction();
     }
-    //³¡¾°Òì²½¼ÓÔØ·½·¨
+    //åœºæ™¯å¼‚æ­¥åŠ è½½æ–¹æ³•
     public void LoadSceneAsync(string name, UnityAction fun)
     {
-        MonoMgr.Instance.StartCoroutine(AsyncFun(name,fun));
+        FrontEvent?.Invoke();
+        MonoMgr.Instance.StartCoroutine(AsyncFun(name, fun));
     }
     private IEnumerator AsyncFun(string name, UnityAction fun)
     {
-        AsyncOperation ao = SceneManager.LoadSceneAsync(name);
-        yield return ao;
-        fun?.Invoke();
-        //Ò²¿ÉÒÔÊÇÏÂÃæÕâÑù
         //AsyncOperation ao = SceneManager.LoadSceneAsync(name);
-        ////±íÊ¾Òì²½¼ÓÔØÎ´Íê³É¾Í»á½øÈëÕâ¸öÑ­»·£¬ºÍÉÏÃæµÄyield return ao Ò»¸öĞ§¹û
-        //while (!ao.isDone)
-        //{
-        //    //½øĞĞ½ø¶ÈÌõ¸üĞÂµÈ²Ù×÷
-        //    yield return ao.progress;
-        //}
+        //yield return ao;
+        //fun?.Invoke();
+        //ä¹Ÿå¯ä»¥æ˜¯ä¸‹é¢è¿™æ ·
+        AsyncOperation ao = SceneManager.LoadSceneAsync(name);
+        ////è¡¨ç¤ºå¼‚æ­¥åŠ è½½æœªå®Œæˆå°±ä¼šè¿›å…¥è¿™ä¸ªå¾ªç¯ï¼Œå’Œä¸Šé¢çš„yield return ao ä¸€ä¸ªæ•ˆæœ
+        while (!ao.isDone)
+        {
+            //è¿›è¡Œè¿›åº¦æ¡æ›´æ–°ç­‰æ“ä½œ
+            LoadingEvent?.Invoke(ao.progress);
+            yield return ao.progress;
+        }
+        yield return ao;
+        BackEvent?.Invoke();
+        fun?.Invoke();
+        //RemoveListenerFunction();
     }
+    // private void RemoveListenerFunction()
+    // {
+    //     FrontEvent.RemoveAllListeners();
+    //     BackEvent.RemoveAllListeners();
+    //     LoadingEvent.RemoveAllListeners();
+    // }
 }

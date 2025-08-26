@@ -17,7 +17,7 @@ TagManager:
   - Player
   - Bullet
   - Obstacle
-  - 
+  - RenderTextureObj
   - 
   - 
   - 
@@ -41,6 +41,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Front
+    uniqueID: 3206707143
     locked: 0
   m_RenderingLayers:
   - Default

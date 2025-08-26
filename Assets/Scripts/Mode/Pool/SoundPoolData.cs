@@ -9,7 +9,7 @@ public class SoundPoolData : PoolData
         GameObject obj = new GameObject(key);
         AudioSource ad = obj.AddComponent<AudioSource>();
         AutoRecycleSound autosound = obj.AddComponent<AutoRecycleSound>();
-        autosound.GetAudio(ad);//传入组件
+        autosound.GiveAudio(ad);//传入组件
         //需要在调用者处手动进行播放
         ad.playOnAwake = false;
         return obj;

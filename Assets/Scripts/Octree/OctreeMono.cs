@@ -4,9 +4,10 @@ namespace Octree
 {
     public class OctreeMono : MonoBehaviour
     {
-        [HideInInspector] public OctreeObject octreeObject;                   //±íÊ¾±¾ÎïÌåµÄ³éÏó°Ë²æÊ÷¿Õ¼ä
+        [HideInInspector] public OctreeObject octreeObject;                   //è¡¨ç¤ºæœ¬ç‰©ä½“çš„æŠ½è±¡å…«å‰æ ‘ç©ºé—´
 
-        [HideInInspector] public Bounds bounds;                               //×ÔÉíµÄ°üÎ§ºĞ
+        [HideInInspector] public Bounds bounds;                               //è‡ªèº«çš„åŒ…å›´ç›’
+        private Vector3 boundsOffset;
         
         protected Vector3 lastPosition = new Vector3();
         public bool isDead = false;
@@ -18,7 +19,7 @@ namespace Octree
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         protected virtual void Start()
         {
-            //½¨Á¢ºÍOctreeµÄÁªÏµ
+            //å»ºç«‹å’ŒOctreeçš„è”ç³»
             OctreeSystemInit();
 
             lastPosition = transform.position;
@@ -31,43 +32,42 @@ namespace Octree
         }
 
         /// <summary>
-        /// ¸ºÔğºÍOctreeÏµÍ³½¨Á¢ÁªÏµ
+        /// è´Ÿè´£å’ŒOctreeç³»ç»Ÿå»ºç«‹è”ç³»
         /// </summary>
         private void OctreeSystemInit()
         {
-            //´´½¨ÎïÌå×ÔÉí°üÎ§ºĞ
+            //åˆ›å»ºç‰©ä½“è‡ªèº«åŒ…å›´ç›’
             CharacterController c = GetComponentInChildren<CharacterController>();
-
             if (c != null)
             {
                 bounds = new Bounds();
                 bounds.Encapsulate(c.bounds);
+                boundsOffset = bounds.center - transform.position;
             }
-
             else bounds = GetComponent<Collider>().bounds;
                 
 
-            //´´½¨ÏàÓ¦µÄOctreeObject
+            //åˆ›å»ºç›¸åº”çš„OctreeObject
             octreeObject = new OctreeObject(bounds, this);
 
-            //°Ñ×ÔÉíµÄOctreeObject×¢²áµ½Êı¾İ¹ÜÀíµ¥ÀıµÄ¹şÏ£±íÖĞ
+            //æŠŠè‡ªèº«çš„OctreeObjectæ³¨å†Œåˆ°æ•°æ®ç®¡ç†å•ä¾‹çš„å“ˆå¸Œè¡¨ä¸­
             GameDataMgr.Instance.octreeMonos.Add(octreeObject);
         }
 
         /// <summary>
-        /// Î»ÖÃ¸üĞÂÍ¬²½²¢Í¨ÖªÏàÓ¦µÄOctreeObject½øĞĞ¸üĞÂ
+        /// ä½ç½®æ›´æ–°åŒæ­¥å¹¶é€šçŸ¥ç›¸åº”çš„OctreeObjectè¿›è¡Œæ›´æ–°
         /// </summary>
         private void CheckPositionChange()
         {
-            //µ±Î»ÖÃ·¢Éú±ä¶¯
+            //å½“ä½ç½®å‘ç”Ÿå˜åŠ¨
             if (transform.position != lastPosition && !isDead)
             {
                 lastPosition = transform.position;
-                //¸Ä±ä°üÎ§ºĞÎ»ÖÃ
-                bounds.center = transform.position;
-                //Ìæ»»OctreeObjectµÄ°üÎ§ºĞ
+                //æ”¹å˜åŒ…å›´ç›’ä½ç½®
+                bounds.center = transform.position + boundsOffset;
+                //æ›¿æ¢OctreeObjectçš„åŒ…å›´ç›’
                 octreeObject.ChangeBounds(bounds);
-                //Í¨ÖªÎ»ÖÃ·¢Éú±ä¶¯£¬¸üĞÂ°Ë²æÊ÷
+                //é€šçŸ¥ä½ç½®å‘ç”Ÿå˜åŠ¨ï¼Œæ›´æ–°å…«å‰æ ‘
                 octreeObject.OctreeUpdate();
                 
             }
@@ -81,7 +81,7 @@ namespace Octree
             }
         }
         /// <summary>
-        /// ¸¨Öúº¯Êı£¬ËÀÍöºóÍÑÀë°Ë²æÊ÷ÏµÍ³
+        /// è¾…åŠ©å‡½æ•°ï¼Œæ­»äº¡åè„±ç¦»å…«å‰æ ‘ç³»ç»Ÿ
         /// </summary>
         private void Dead()
         {
@@ -92,11 +92,11 @@ namespace Octree
 
         protected virtual void OnDrawGizmos()
         {
-            //Gizmos.DrawWireCube(bounds.center, bounds.size);//    ±íÊ¾Êµ¼ÊÕ¼¾İ¿Õ¼ä
+            //Gizmos.DrawWireCube(bounds.center, bounds.size);//    è¡¨ç¤ºå®é™…å æ®ç©ºé—´
         }
         protected virtual void OnDisable()
         {
-            Debug.Log($"{gameObject.name} µÄ OnDisable ±»µ÷ÓÃ£¡×é¼şÊÇ·ñÆôÓÃ£º{enabled}£¬¶ÔÏóÊÇ·ñ¼¤»î£º{gameObject.activeSelf}", this);
+            Debug.Log($"{gameObject.name} çš„ OnDisable è¢«è°ƒç”¨ï¼ç»„ä»¶æ˜¯å¦å¯ç”¨ï¼š{enabled}ï¼Œå¯¹è±¡æ˜¯å¦æ¿€æ´»ï¼š{gameObject.activeSelf}", this);
             octreeObject.BreakParent(true);
             octreeObject = null;
             isDead = false;

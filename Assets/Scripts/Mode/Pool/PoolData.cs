@@ -3,81 +3,86 @@ using UnityEngine;
 
 public abstract class PoolData
 {
-    //´ú±íÃ¿Ò»¸ö³Ø×Ó¶ÔÏóÀàĞÍµÄ¸¸¶ÔÏó
+    //ä»£è¡¨æ¯ä¸€ä¸ªæ± å­å¯¹è±¡ç±»å‹çš„çˆ¶å¯¹è±¡
     public GameObject Father;
 
     protected int least = 5;    
-    public virtual int Least { get { return least ; } set { least = value; } }//ÓÃÀ´¿ØÖÆ×îĞ¡±£ÁôÖµ//ÖØĞ´¿ÉÒÔÊµÏÖ¸Ä±äÄ¬ÈÏ×îĞ¡Öµ
+    public virtual int Least { get { return least ; } set { least = value; } }//ç”¨æ¥æ§åˆ¶æœ€å°ä¿ç•™å€¼//é‡å†™å¯ä»¥å®ç°æ”¹å˜é»˜è®¤æœ€å°å€¼
     private int getSetCount = 0;
     /// <summary>
-    /// ÆµÂÊ
+    /// é¢‘ç‡
     /// </summary>
     public virtual int GetSetCount {  get { return getSetCount; } set { getSetCount = Mathf.Max(value,0); } }
 
-    public Queue<GameObject> poolList;
-    //ÏÔÊ¾ÉùÃ÷ÎŞ²Î¹¹Ôìº¯Êı,ÒÔ·ÀÍòÒ»
+    /// <summary>
+    /// å¯¹è±¡æ± æ•°é‡
+    /// </summary>
+    public int PoolListCount => poolList.Count;
+
+    private Queue<GameObject> poolList;
+    //æ˜¾ç¤ºå£°æ˜æ— å‚æ„é€ å‡½æ•°,ä»¥é˜²ä¸‡ä¸€
     public PoolData() { }
-    //´«ÈëµÄÊÇÒª´æ´¢µÄ¶ÔÏó£¨ÓÃÀ´È¡Ãû£©£»³¡¾°ÉÏ´´½¨µÄ¶ÔÏó³Ø£¨ÓÃÀ´ÉèÖÃ¸¸¶ÔÏó£©
+    //ä¼ å…¥çš„æ˜¯è¦å­˜å‚¨çš„å¯¹è±¡ï¼ˆç”¨æ¥å–åï¼‰ï¼›åœºæ™¯ä¸Šåˆ›å»ºçš„å¯¹è±¡æ± ï¼ˆç”¨æ¥è®¾ç½®çˆ¶å¯¹è±¡ï¼‰
     public void InitPoolData(string name, GameObject poolObj)
     {
         Father = new GameObject(name);
         Father.transform.parent = poolObj.transform;
         poolList = new Queue<GameObject>();
     }
-    //ÌáÇ°¼ÓÔØ¶à¸ö¶ÔÏó//Òì²½¼ÓÔØ//·ÇÊ¹ÓÃÕßµ÷ÓÃ£¬Ò»°ã¼ÓÔØ¹ı³¡¾°µÄÊ±ºòµ÷ÓÃ
+    //æå‰åŠ è½½å¤šä¸ªå¯¹è±¡//å¼‚æ­¥åŠ è½½//éä½¿ç”¨è€…è°ƒç”¨ï¼Œä¸€èˆ¬åŠ è½½è¿‡åœºæ™¯çš„æ—¶å€™è°ƒç”¨
     /// <summary>
-    /// Ò»°ã¼ÓÔØ¹ı³¡¾°µÄÊ±ºòµ÷ÓÃ
+    /// ä¸€èˆ¬åŠ è½½è¿‡åœºæ™¯çš„æ—¶å€™è°ƒç”¨
     /// </summary>
-    /// <param name="name">¶ÔÏóÃû</param>
-    /// <param name="poolObj">¶ÔÏó³ØµÄ¸¸¶ÔÏó</param>
-    /// <param name="objNum">ĞèÒªÌáÇ°¼ÓÔØµÄ¶ÔÏóÊıÁ¿</param>
-    /// <param name="path">¶ÔÏóµÄÂ·¾¶</param>
+    /// <param name="name">å¯¹è±¡å</param>
+    /// <param name="poolObj">å¯¹è±¡æ± çš„çˆ¶å¯¹è±¡</param>
+    /// <param name="objNum">éœ€è¦æå‰åŠ è½½çš„å¯¹è±¡æ•°é‡</param>
+    /// <param name="path">å¯¹è±¡çš„è·¯å¾„</param>
     public void InitPoolData(string name, GameObject poolObj, int objNum, string path = null)
     {
         InitPoolData(name, poolObj);
         for (int i = 0; i < objNum; i++)
         {
-            //ÊµÀı»¯ÏàÓ¦ÊıÁ¿µÄ¶ÔÏó²¢½øĞĞ´æ´¢
+            //å®ä¾‹åŒ–ç›¸åº”æ•°é‡çš„å¯¹è±¡å¹¶è¿›è¡Œå­˜å‚¨
             SetValue(ObjectInstante(Father.name,path));
             getSetCount++;
         }
     }
 
 
-    //È¡
+    //å–
     public virtual GameObject GetValue(string path = null)
     {
         getSetCount++;
         GameObject obj = null;
-        //ÓĞ¶ÔÏó
+        //æœ‰å¯¹è±¡
         if (poolList.Count > 0)
         {
             obj = poolList.Dequeue();
         }
-        //Ã»¶ÔÏó
+        //æ²¡å¯¹è±¡
         else
         {
-            //ÊµÀı»¯
+            //å®ä¾‹åŒ–
             obj = ObjectInstante(Father.name, path);
         }
-        // //È¡Ïû¸¸¶ÔÏó£¬Ö±¹ÛµØÏÔÊ¾ÔÚ²ã¼¶Ãæ°åÉÏ
+        // //å–æ¶ˆçˆ¶å¯¹è±¡ï¼Œç›´è§‚åœ°æ˜¾ç¤ºåœ¨å±‚çº§é¢æ¿ä¸Š
         // obj.transform.parent = null;
         obj.SetActive(true);
         return obj;
     }
-    //´æ
-    public virtual void SetValue(GameObject obj)//Ğéº¯ÊıÈÃ×ÓÀà¿ÉÒÔÖØĞ´»ØÊÕÂß¼­£¬ÓÃÓÚÌØĞ§Á£×ÓÑÓÊ±»ØÊÕµÈÌØÊâÇé¿ö
+    //å­˜
+    public virtual void SetValue(GameObject obj)//è™šå‡½æ•°è®©å­ç±»å¯ä»¥é‡å†™å›æ”¶é€»è¾‘ï¼Œç”¨äºç‰¹æ•ˆç²’å­å»¶æ—¶å›æ”¶ç­‰ç‰¹æ®Šæƒ…å†µ
     {
         getSetCount++;
         obj.transform.parent = Father.transform;
         obj.name = Father.name;
-        //Òş²Ø
+        //éšè—
         obj.SetActive(false);
         poolList.Enqueue(obj);
     }
-    //ÊµÀı»¯·½·¨£¬ÈÃ×ÓÀà¿ÉÒÔÖØĞ´ÊµÀı»¯·½·¨£¬ÊµÏÖÊµÀı»¯µÄ¶àÑùĞÔ
+    //å®ä¾‹åŒ–æ–¹æ³•ï¼Œè®©å­ç±»å¯ä»¥é‡å†™å®ä¾‹åŒ–æ–¹æ³•ï¼Œå®ç°å®ä¾‹åŒ–çš„å¤šæ ·æ€§
     protected abstract GameObject ObjectInstante(string key,string path = null);
-    ////Òì²½ÊµÀı»¯·½·¨ 
+    ////å¼‚æ­¥å®ä¾‹åŒ–æ–¹æ³• 
     //protected GameObject ObjecsInstanteAsync(string key)
     //{
 

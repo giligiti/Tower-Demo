@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 
-//¶ÔÏó³Ø¹ÜÀíÔ±
-//¸ºÔğ°Ñ¶ÔÏó¼ÓÈë¶ÔÏó³Ø£¬ÒÔ¼°´Ó¶ÔÓ¦µÄ¶ÔÏó³ØÖĞÈ¡³ö
-//YÊÇ¶ÔÏó³Ø¹ÜÀíÔ±¹ÜÀíµÄ¾ßÌå¶ÔÏó³ØÀàĞÍ£¬ÈçMonsterPoolData  Èç¹ûÊÇÈ¡³ö»òÕß´æÈëMonsterÀàĞÍ(BaseMonster)ÔòY¾ÍÊÇMonsterPoolData
-//µ÷ÓÃ¶ÔÏó³ØĞèÒªÖ¸Ã÷ÓÃÄÄÖÖ¶ÔÏó³Ø¡£²»Í¬µÄ¶ÔÏó³ØµÄÊµÀı»¯·½·¨²»Í¬
-//µ±Ö´ĞĞÀàËÆÓÎÏ·ÔİÍ£²Ù×÷µÄÊ±ºò£¬ĞèÒªµ÷ÓÃÍ£Ö¹¶¨ÆÚÇåÀíµÄ·½·¨
+//å¯¹è±¡æ± ç®¡ç†å‘˜
+//è´Ÿè´£æŠŠå¯¹è±¡åŠ å…¥å¯¹è±¡æ± ï¼Œä»¥åŠä»å¯¹åº”çš„å¯¹è±¡æ± ä¸­å–å‡º
+//Yæ˜¯å¯¹è±¡æ± ç®¡ç†å‘˜ç®¡ç†çš„å…·ä½“å¯¹è±¡æ± ç±»å‹ï¼Œå¦‚MonsterPoolData  å¦‚æœæ˜¯å–å‡ºæˆ–è€…å­˜å…¥Monsterç±»å‹(BaseMonster)åˆ™Yå°±æ˜¯MonsterPoolData
+//è°ƒç”¨å¯¹è±¡æ± éœ€è¦æŒ‡æ˜ç”¨å“ªç§å¯¹è±¡æ± ã€‚ä¸åŒçš„å¯¹è±¡æ± çš„å®ä¾‹åŒ–æ–¹æ³•ä¸åŒ
+//å½“æ‰§è¡Œç±»ä¼¼æ¸¸æˆæš‚åœæ“ä½œçš„æ—¶å€™ï¼Œéœ€è¦è°ƒç”¨åœæ­¢å®šæœŸæ¸…ç†çš„æ–¹æ³•
 public class PoolMgr : BaseManager<PoolMgr> 
 {
-    //¶ÔÏó³ØÎïÌå£¬ÓÃ×÷¸¸ÎïÌå
+    //å¯¹è±¡æ± ç‰©ä½“ï¼Œç”¨ä½œçˆ¶ç‰©ä½“
     private GameObject Pool;
     private PoolMgr()
     {
@@ -19,34 +19,40 @@ public class PoolMgr : BaseManager<PoolMgr>
     }
     private Coroutine clearCheckCoroutine;
 
-    private int clearNum = 5;            //Ã¿´ÎÇåÀíĞèÒªÇåÀíµÄ¶ÔÏó³Ø³ÉÔ±ÊıÁ¿
-    private int clearFrequency = 10;     //Ã¿´ÎÇåÀíĞèÒª¼õÉÙÆµÂÊµÄÖµ
-    private int clearThresholds = 10;    //ÇåÀíãĞÖµ£¨ÆµÂÊ£©£¬µÍÓÚ¸ÃÖµÔò»á±»ÇåÀí
-    private int clearDelayTime = 300;    //¶ÔÏó³Ø¶¨ÆÚÇåÀíµÄÊ±¼ä£¬µ¥Î»£ºÃë£»
+    private int clearNum = 5;            //æ¯æ¬¡æ¸…ç†éœ€è¦æ¸…ç†çš„å¯¹è±¡æ± æˆå‘˜æ•°é‡
+    private int clearFrequency = 10;     //æ¯æ¬¡æ¸…ç†éœ€è¦å‡å°‘é¢‘ç‡çš„å€¼
+    private int clearThresholds = 10;    //æ¸…ç†é˜ˆå€¼ï¼ˆé¢‘ç‡ï¼‰ï¼Œä½äºè¯¥å€¼åˆ™ä¼šè¢«æ¸…ç†
+    private int clearDelayTime = 300;    //å¯¹è±¡æ± å®šæœŸæ¸…ç†çš„æ—¶é—´ï¼Œå•ä½ï¼šç§’ï¼›
     /// <summary>
-    /// ¶ÔÏó³Ø¶¨ÆÚÇåÀíµÄÊ±¼ä
+    /// å¯¹è±¡æ± å®šæœŸæ¸…ç†çš„æ—¶é—´
     /// </summary>
     public int ClearDelayTime { get { return clearDelayTime; }set { clearDelayTime = Mathf.Max(value, 5); } }
-    //»º´æ³ØÈİÆ÷
+    //ç¼“å­˜æ± å®¹å™¨
     private Dictionary<string, PoolData> PoolDic = new Dictionary<string, PoolData>();
-    #region È¡³ö¶ÔÏóÏà¹Ø
+    #region å–å‡ºå¯¹è±¡ç›¸å…³
+
+    public GameObject GetObject<X, Y>(string key, string path = null) where Y : PoolData, new()
+    {
+        string name = nameof(X);
+        return GetObj<Y>(key, path);
+    }
 
     /// <summary>
-    /// È¡³ö¶ÔÏóµÄ·½·¨ÖØÔØ
+    /// å–å‡ºå¯¹è±¡çš„æ–¹æ³•é‡è½½
     /// </summary>
-    /// <param name="key">¶ÔÏó³ØµÄÃû×Ö</param>
+    /// <param name="key">å¯¹è±¡æ± çš„åå­—</param>
     /// <returns></returns>
     public GameObject GetObject<Y>(string key, string path = null) where Y : PoolData, new()
     {
         return GetObj<Y>(key, path);
     }
-    //ÕæÕıÈ¡³öµÄ·½·¨
+    //çœŸæ­£å–å‡ºçš„æ–¹æ³•
     private GameObject GetObj<Y>(string key, string path = null) where Y : PoolData, new()
     {
         FirstCheck();
 
         GameObject obj = null;
-        //Èç¹û²»´æÔÚ¼ü
+        //å¦‚æœä¸å­˜åœ¨é”®
         if (!PoolDic.ContainsKey(key))
         {
             Y pool = new Y();
@@ -59,35 +65,36 @@ public class PoolMgr : BaseManager<PoolMgr>
         return obj;
     }
 
+    //æå‰å®ä¾‹åŒ–å¤šä¸ªç‰©ä½“ï¼ˆä¸å–å‡ºï¼Œè‡ªåŠ¨å¤±æ´»ï¼‰
     /// <summary>
-    /// ¹ı³¡¾°Ê±ÌáÇ°¼ÓÔØ¶à¸ö¶ÔÏó
+    /// è¿‡åœºæ™¯æ—¶æå‰åŠ è½½å¤šä¸ªå¯¹è±¡
     /// </summary>
-    /// <param name="key">¶ÔÏóÃû</param>
-    /// <param name="objNum">ĞèÒªÉú³ÉµÄÊıÁ¿</param>
-    /// <param name="path">×ÊÔ´Â·¾¶</param>
-    public void AdvanceInstante<Y>(string key, int objNum, string path = null) where Y : PoolData, new()
+    /// <param name="key">å¯¹è±¡å</param>
+    /// <param name="objNum">éœ€è¦ç”Ÿæˆçš„æ•°é‡</param>
+    /// <param name="path">èµ„æºè·¯å¾„</param>
+    public void AdvanceInstantite<Y>(string key, int objNum, string path = null) where Y : PoolData, new()
     {
         AdvanceInit<Y>(key, objNum, path);
     }
     /// <summary>
-    /// ¹ı³¡¾°Ê±ÌáÇ°¼ÓÔØ¶à¸ö¶ÔÏóµÄ·ºĞÍ·½·¨£¬TÎª¶ÔÏó³ØÃû
+    /// è¿‡åœºæ™¯æ—¶æå‰åŠ è½½å¤šä¸ªå¯¹è±¡çš„æ³›å‹æ–¹æ³•ï¼ŒTä¸ºå¯¹è±¡æ± å
     /// </summary>
-    /// <param name="objNum">ĞèÒªÉú³ÉµÄÊıÁ¿</param>
-    /// <param name="path">×ÊÔ´Â·¾¶</param>
-    public void AdvanceInstante<T,Y>(int objNum, string path = null) where Y : PoolData, new()
+    /// <param name="objNum">éœ€è¦ç”Ÿæˆçš„æ•°é‡</param>
+    /// <param name="path">èµ„æºè·¯å¾„</param>
+    public void AdvanceInstantite<T,Y>(int objNum, string path = null) where Y : PoolData, new()
     {
         string key = typeof(T).Name;
         AdvanceInit<Y>(key, objNum, path);
     }
-    //Ìø¹ı¶ÔÏó³Ø¹ÜÀí×ÔÉíµÄÈ¡³ö·½·¨£¬Ö±½Óµ÷ÓÃ¶ÔÏó³ØÄÚ²¿µÄÊµÀı»¯¶à¸ö¶ÔÏóµÄ·½·¨
+    //è·³è¿‡å¯¹è±¡æ± ç®¡ç†è‡ªèº«çš„å–å‡ºæ–¹æ³•ï¼Œç›´æ¥è°ƒç”¨å¯¹è±¡æ± å†…éƒ¨çš„å®ä¾‹åŒ–å¤šä¸ªå¯¹è±¡çš„æ–¹æ³•
     private void AdvanceInit<Y>(string key, int objNum, string path = null) where Y : PoolData, new()
     {
         FirstCheck();
-        //Èç¹û²»´æÔÚ¼ü
+        //å¦‚æœä¸å­˜åœ¨é”®
         if (!PoolDic.ContainsKey(key))
         {
             Y pool = new Y();
-            //ÊµÀı»¯¶ÔÓ¦ÊıÁ¿µÄ¶ÔÏó²¢×Ô¶¯½øĞĞ´æ´¢
+            //å®ä¾‹åŒ–å¯¹åº”æ•°é‡çš„å¯¹è±¡å¹¶è‡ªåŠ¨è¿›è¡Œå­˜å‚¨
             pool.InitPoolData(key, Pool, objNum, path);
         }
         else
@@ -98,19 +105,19 @@ public class PoolMgr : BaseManager<PoolMgr>
 
     #endregion
 
-    #region ´æ´¢¶ÔÏóÏà¹Ø
+    #region å­˜å‚¨å¯¹è±¡ç›¸å…³
 
-    //´æ
+    //å­˜
     public void PushObject<T,Y>(GameObject obj) where Y : PoolData, new()
     {
         FirstCheck();
         string key = typeof(T).Name;
-        //Èç¹û²»´æÔÚ¼ü
+        //å¦‚æœä¸å­˜åœ¨é”®
         if (!PoolDic.ContainsKey(key))
         {
-            Y pool = new Y();               //´´½¨ĞÂ¶ÔÏó³Ø
-            pool.InitPoolData(key, Pool);   //³õÊ¼»¯¸Ã¶ÔÏó³Ø
-            PoolDic.Add(key, pool);         //°Ñ¶ÔÏó¼ÓÈë¶ÔÏó³Ø
+            Y pool = new Y();               //åˆ›å»ºæ–°å¯¹è±¡æ± 
+            pool.InitPoolData(key, Pool);   //åˆå§‹åŒ–è¯¥å¯¹è±¡æ± 
+            PoolDic.Add(key, pool);         //æŠŠå¯¹è±¡åŠ å…¥å¯¹è±¡æ± 
         }
 
         PoolDic[key].SetValue(obj);
@@ -118,12 +125,12 @@ public class PoolMgr : BaseManager<PoolMgr>
     public void PushObject<Y>(string name, GameObject obj) where Y : PoolData, new()
     {
         FirstCheck();
-        //Èç¹û²»´æÔÚ¼ü
+        //å¦‚æœä¸å­˜åœ¨é”®
         if (!PoolDic.ContainsKey(name))
         {
-            Y pool = new Y();               //´´½¨ĞÂ¶ÔÏó³Ø
-            pool.InitPoolData(name, Pool);   //³õÊ¼»¯¸Ã¶ÔÏó³Ø
-            PoolDic.Add(name, pool);         //°Ñ¶ÔÏó¼ÓÈë¶ÔÏó³Ø
+            Y pool = new Y();               //åˆ›å»ºæ–°å¯¹è±¡æ± 
+            pool.InitPoolData(name, Pool);   //åˆå§‹åŒ–è¯¥å¯¹è±¡æ± 
+            PoolDic.Add(name, pool);         //æŠŠå¯¹è±¡åŠ å…¥å¯¹è±¡æ± 
         }
 
         PoolDic[name].SetValue(obj);
@@ -132,9 +139,9 @@ public class PoolMgr : BaseManager<PoolMgr>
 
     #endregion
 
-    #region ÇåÀí¶ÔÏó³ØÏà¹Ø
+    #region æ¸…ç†å¯¹è±¡æ± ç›¸å…³
 
-    //Çå¿Õ»º´æ³ØµÄ²Ù×÷
+    //æ¸…ç©ºç¼“å­˜æ± çš„æ“ä½œ
     public void ClearPool()
     {
         PoolDic.Clear();
@@ -142,43 +149,43 @@ public class PoolMgr : BaseManager<PoolMgr>
         Pool = null;
     }
 
-    //¶¨ÆÚ¼ì²éÇåÀí¶ÔÏó³Ø
+    //å®šæœŸæ£€æŸ¥æ¸…ç†å¯¹è±¡æ± 
     IEnumerator IEWaitForDelyTime()
     {
         yield return new WaitForSecondsRealtime(clearDelayTime);
         MonoMgr.Instance.StartCoroutine(IEClearPool());
-        clearCheckCoroutine = MonoMgr.Instance.StartCoroutine(IEWaitForDelyTime());//·´¸´¿ªÆô×ÔÉí£¬ÊµÏÖÃ¿´Î¶¨ÆÚ¼ì²é
+        clearCheckCoroutine = MonoMgr.Instance.StartCoroutine(IEWaitForDelyTime());//åå¤å¼€å¯è‡ªèº«ï¼Œå®ç°æ¯æ¬¡å®šæœŸæ£€æŸ¥
     }
     IEnumerator IEClearPool()
     {
-        Debug.Log("¿ªÊ¼ÇåÀí");
-        //²éÕÒ³öĞèÒªÉ¾³ıµÄ¶ÔÏó³ØÔÚÔÙÒ»ÆğÉ¾³ı
+        Debug.Log("å¼€å§‹æ¸…ç†");
+        //æŸ¥æ‰¾å‡ºéœ€è¦åˆ é™¤çš„å¯¹è±¡æ± åœ¨å†ä¸€èµ·åˆ é™¤
         List<string> keyList = new List<string>();  
         foreach (var pool in PoolDic)
         {
-            //ÆµÂÊµÍÓÚãĞÖµµÄÇÒÊıÁ¿´óÓÚ×îĞ¡±£³ÖÊıÁ¿µÄ¶ÔÏó³Ø½øĞĞ¼ÇÂ¼ÇåÀí
-            if (pool.Value.GetSetCount < clearThresholds && pool.Value.poolList.Count > pool.Value.Least)
+            //é¢‘ç‡ä½äºé˜ˆå€¼çš„ä¸”æ•°é‡å¤§äºæœ€å°ä¿æŒæ•°é‡çš„å¯¹è±¡æ± è¿›è¡Œè®°å½•æ¸…ç†
+            if (pool.Value.GetSetCount < clearThresholds && pool.Value.PoolListCount > pool.Value.Least)
             {
                 keyList.Add(pool.Key);
             }
             else
             {
-                //Ã¿´ÎÖ´ĞĞ¶¨ÆÚÇåÀí¾Í»á¼õÉÙÆµÂÊ;
+                //æ¯æ¬¡æ‰§è¡Œå®šæœŸæ¸…ç†å°±ä¼šå‡å°‘é¢‘ç‡;
                 pool.Value.GetSetCount -= clearFrequency; 
             }
             yield return null;
         }
-        //È·¶¨ÒªÇåÀíµÄ²Å»á½øÈëÕâ¸öÑ­»·
+        //ç¡®å®šè¦æ¸…ç†çš„æ‰ä¼šè¿›å…¥è¿™ä¸ªå¾ªç¯
         foreach (var key in keyList)
         {
             Debug.Log(key);
-            //³Ø×ÓÖĞ³ÉÔ±ÊıÁ¿ÉÙÓÚãĞÖµÔòÏú»ÙºóÖ±½ÓÈ«²¿ÇåÀí
-            int i = PoolDic[key].poolList.Count <= clearNum? PoolDic[key].Least: PoolDic[key].poolList.Count - clearNum;
+            //æ± å­ä¸­æˆå‘˜æ•°é‡å°‘äºé˜ˆå€¼åˆ™é”€æ¯åç›´æ¥å…¨éƒ¨æ¸…ç†
+            int i = PoolDic[key].PoolListCount <= clearNum? PoolDic[key].Least: PoolDic[key].PoolListCount - clearNum;
 
-            //whileÑ­»·Ìõ¼şÈ·±£ÁË¼´Ê¹È·¶¨ÒªÉ¾³ı¶ÔÏó³ØºóÖĞÍ¾ÄÄÅÂÓĞĞÂµÄ´æÈë¶ÔÏóºÍÈ¡³ö¶ÔÏóÒ²»áÕı³£ÔË×÷
-            //É¾³ıºó´æÈ¡µÄÂß¼­ÓÉ¶ÔÏó³Ø¹ÜÀíÆ÷½Å±¾µÄgetºÍpush·½·¨±£ÕÏ»á´´½¨ĞÂ¼ü
-            //¶ÔÏó³Ø»áÇåÀíÖ±µ½ÊıÁ¿¼õÉÙµ½×îĞ¡Öµ
-            while (PoolDic[key].poolList.Count > i )
+            //whileå¾ªç¯æ¡ä»¶ç¡®ä¿äº†å³ä½¿ç¡®å®šè¦åˆ é™¤å¯¹è±¡æ± åä¸­é€”å“ªæ€•æœ‰æ–°çš„å­˜å…¥å¯¹è±¡å’Œå–å‡ºå¯¹è±¡ä¹Ÿä¼šæ­£å¸¸è¿ä½œ
+            //åˆ é™¤åå­˜å–çš„é€»è¾‘ç”±å¯¹è±¡æ± ç®¡ç†å™¨è„šæœ¬çš„getå’Œpushæ–¹æ³•ä¿éšœä¼šåˆ›å»ºæ–°é”®
+            //å¯¹è±¡æ± ä¼šæ¸…ç†ç›´åˆ°æ•°é‡å‡å°‘åˆ°æœ€å°å€¼
+            while (PoolDic[key].PoolListCount > i )
             {
                 GameObject obj = PoolDic[key].GetValue();
                 obj.SetActive(false);
@@ -189,7 +196,7 @@ public class PoolMgr : BaseManager<PoolMgr>
         }
     }
     /// <summary>
-    /// Í£Ö¹¶¨ÆÚÇåÀí¼ì²é
+    /// åœæ­¢å®šæœŸæ¸…ç†æ£€æŸ¥
     /// </summary>
     public void StopClearCheck()
     {
@@ -197,8 +204,8 @@ public class PoolMgr : BaseManager<PoolMgr>
         MonoMgr.Instance.StopCoroutine(clearCheckCoroutine);
     }
     /// <summary>
-    /// ¿ªÆô¶¨ÆÚÇåÀí¼ì²é
-    /// Ä¬ÈÏµÚÒ»´Î´´½¨¶ÔÏó³ØµÄÊ±ºò¿ªÊ¼²Å¿ªÊ¼¶¨ÆÚ¼ì²é
+    /// å¼€å¯å®šæœŸæ¸…ç†æ£€æŸ¥
+    /// é»˜è®¤ç¬¬ä¸€æ¬¡åˆ›å»ºå¯¹è±¡æ± çš„æ—¶å€™å¼€å§‹æ‰å¼€å§‹å®šæœŸæ£€æŸ¥
     /// </summary>
     public void StartClearCheck()
     {

@@ -1,0 +1,18 @@
+完成人物可在UI前拖动			=
+完成正式开始游戏前的UI面板
+完成炮塔声音
+完成怪物血条
+完成怪物bounds的位置问题		=ok
+
+
+
+小心得
+Canvas的属性：
+.renderMode ; 可以点出是渲染在世界空间，就是ui的渲染模式
+.worldCamera  ;这个属性可以赋值哪个相机来渲染他们
+
+设置相机的堆栈
+var baseData = baseCamera.GetUniversalAdditionalCameraData();
+cameradata.cameraStack.Add(camera);
+排除层级（inspector窗口上的）
+MainCamera.cullingMask &= ~layer.value;
