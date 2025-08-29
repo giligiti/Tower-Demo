@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class OptionsPanel : BasePanel
 {
-    [SerializeField] GameObject windonw;
+    [SerializeField] GameObject window;
     [SerializeField] Button btnClose;
     [SerializeField] Button btnConfirm;
     [SerializeField] Toggle musicOpen;
@@ -22,8 +22,8 @@ public class OptionsPanel : BasePanel
     {
         base.Awake();
         SyncData();
-        windonw.transform.localScale = Vector3.one / 2;
-        windonw.transform.DOScale(1f, 0.2f).SetEase(Ease.OutBack).SetUpdate(true);
+        window.transform.localScale = Vector3.one / 2;
+        window.transform.DOScale(1f, 0.2f).SetEase(Ease.OutBack).SetUpdate(true);
     }
     protected override void Init()
     {
@@ -43,7 +43,7 @@ public class OptionsPanel : BasePanel
             SoundMgr.Instance.SavaMusicData();
             SoundMgr.Instance.PlayUISound(E_SoundClip.ui_Button);
             //缩小并关闭面板
-            transform.DOScale(originScale * 0.7f, 0.2f).SetEase(Ease.InSine).OnComplete(() =>
+            window.transform.DOScale(originScale * 0.7f, 0.2f).SetEase(Ease.InSine).OnComplete(() =>
             UIManager.Instance.HidePanel<OptionsPanel>(false));
         });
 
@@ -92,7 +92,6 @@ public class OptionsPanel : BasePanel
         soundOpen.isOn = !data.soundMute;
         musicValue.value = data.musicValue;
         soundValue.value = data.soundValue;
-        Debug.Log(musicOpen.isOn + "   " + soundOpen.isOn + "   " + musicValue.value + "   " + soundValue.value);
     }
 
 }
