@@ -11,9 +11,9 @@ namespace Octree
 
         public Octree octree;
 
-        public List<OctreeNode> parents = new List<OctreeNode>();               //´æ´¢ÎïÌåËùÊôµÄÒ¶×Ó½Úµã
+        public List<OctreeNode> parents = new List<OctreeNode>();               //å­˜å‚¨ç‰©ä½“æ‰€å±çš„å¶å­èŠ‚ç‚¹
 
-        public OctreeMono octMonoObj;                                           //±íÊ¾Õâ¸öOctreeObjectÕæÕı¹ØÁªµÄÎïÌå//ÓÃÓÚ°Ë²æÊ÷²éÑ¯
+        public OctreeMono octMonoObj;                                           //è¡¨ç¤ºè¿™ä¸ªOctreeObjectçœŸæ­£å…³è”çš„ç‰©ä½“//ç”¨äºå…«å‰æ ‘æŸ¥è¯¢
 
         public UnityEvent OctreeComplete = new UnityEvent();                           
 
@@ -24,7 +24,7 @@ namespace Octree
         }
 
         /// <summary>
-        /// µÃµ½ËùÊôµÄ°Ë²æÊ÷ÁË
+        /// å¾—åˆ°æ‰€å±çš„å…«å‰æ ‘äº†
         /// </summary>
         public void OctreeSystemGet(Octree octree)
         {
@@ -35,38 +35,38 @@ namespace Octree
         public void ChangeBounds(Bounds obj) => this.bounds = obj;
 
         /// <summary>
-        /// ¼ì²âboundsToCheckºÍ¸ÃOctreeObjectÎïÌåµÄ°üÎ§ºĞÊÇ·ñÏà½»
+        /// æ£€æµ‹boundsToCheckå’Œè¯¥OctreeObjectç‰©ä½“çš„åŒ…å›´ç›’æ˜¯å¦ç›¸äº¤
         /// </summary>
         /// <param name="boundsToCheck"></param>
         /// <returns></returns>
         public bool Intersects(Bounds boundsToCheck) => bounds.Intersects(boundsToCheck);
 
         /// <summary>
-        /// Éè¶¨ÎïÌåËùÊôµÄÒ¶×Ó½Úµã
+        /// è®¾å®šç‰©ä½“æ‰€å±çš„å¶å­èŠ‚ç‚¹
         /// </summary>
         /// <param name="node"></param>
         public void BelongNode(OctreeNode node) => parents.Add(node);
 
-        //±»OctreeMonoµ÷ÓÃµÄ·½·¨
+        //è¢«OctreeMonoè°ƒç”¨çš„æ–¹æ³•
 
         /// <summary>
-        /// ¸üĞÂ°Ë²æÊ÷
+        /// æ›´æ–°å…«å‰æ ‘
         /// </summary>
         public void OctreeUpdate()
         {
-            //¶Ï¿ª¾É¹ØÁª
+            //æ–­å¼€æ—§å…³è”
             BreakParent(false);
             
             octree.ReDivide(this);
         }
 
         /// <summary>
-        /// ¹ØÁªµÄÎïÌåÏú»Ù»òÕßÊ§»îµÄÊ±ºò
+        /// å…³è”çš„ç‰©ä½“é”€æ¯æˆ–è€…å¤±æ´»çš„æ—¶å€™
         /// </summary>
-        /// <param name="isbreakAll">ÊÇ·ñ²»ÔÙ¼ÓÈë°Ë²æÊ÷</param>
+        /// <param name="isbreakAll">æ˜¯å¦ä¸å†åŠ å…¥å…«å‰æ ‘</param>
         public void BreakParent(bool isbreakAll)
         {
-            //¶Ï¿ª¾É¹ØÁª
+            //æ–­å¼€æ—§å…³è”
             if (parents.Count > 0)
             {
                 foreach (OctreeNode node in parents)

@@ -1,36 +1,51 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using Octree;
 using UnityEngine;
+using UnityEngine.Events;
 
+[RequireComponent(typeof(TurretBaseAttack))]
 public class TurretBase : MonoBehaviour, IInit, IGetRange
 {
-    public Transform yawObject;                                     //ÅÚËşĞı×ªÌ¨
-    public Transform pitchObject;                                   //ÅÚ¿ÚĞı×ª
-    private float pitchIdentity;                                    //ÅÚ¿ÚÄ¬ÈÏ½Ç¶È
+    public Transform yawObject;                                     //ç‚®å¡”æ—‹è½¬å°
+    public Transform pitchObject;                                   //ç‚®å£æ—‹è½¬
+    private float pitchIdentity;                                    //ç‚®å£é»˜è®¤è§’åº¦
 
-    public TurretBaseAttack atkBehaviour;                           //¹¥»÷½Å±¾£¬ÔÚinspector´°¿ÚÒıÓÃ
-    public OctreeMonoCheck roomCheck;                               //×ÔÉí¹ÒÔØµÄ°Ë²æÊ÷¿Õ¼ä¼ì²â½Å±¾
-    [HideInInspector] public float Range => attackedRange;          //½Ó¿ÚÌá¹©ÓÃÓÚ¿Õ¼ä¼ì²â
-    private GameObject targetObj;                                   //Ä¿±ê
-    private OctreeMono targetMono;                                  //ÓÃÓÚ»ñÈ¡Ä¿±êµÄ°üÎ§ºĞ
-    //ÎªÁËµ÷ÊÔ·½±ãËùÒÔĞòÁĞ»¯
-    [SerializeField] private int attackedRange;                     //¹¥»÷·¶Î§
-    
-    [SerializeField] private int VerticalSpeed;                     //¸©ÑöËÙ¶È
-    [SerializeField] private float verticalAngleUp;                 //Ñö½Ç
-    [SerializeField] private float verticalAngleDown;               //¸©½Ç
-    [SerializeField] private int horizontalSpeed;                   //×ªÍäËÙ¶È
-    [SerializeField] private int horizontalAngle;                   //ºáÏò×ªÍä½Ç¶È
-    private Quaternion Xturn;                                       //Ä¿±êºáÏò×ªÍä
-    private Quaternion Yturn;                                       //Ä¿±ê×İÏò×ªÍä
+    public TurretBaseAttack atkBehaviour;                           //æ”»å‡»è„šæœ¬ï¼Œåœ¨inspectorçª—å£å¼•ç”¨
+    public OctreeMonoCheck roomCheck;                               //è‡ªèº«æŒ‚è½½çš„å…«å‰æ ‘ç©ºé—´æ£€æµ‹è„šæœ¬
+    [HideInInspector] public float Range => attackedRange;          //æ¥å£æä¾›ç”¨äºç©ºé—´æ£€æµ‹
+    private GameObject targetObj;                                   //ç›®æ ‡
+    private OctreeMono targetMono;                                  //ç”¨äºè·å–ç›®æ ‡çš„åŒ…å›´ç›’
+    //ä¸ºäº†è°ƒè¯•æ–¹ä¾¿æ‰€ä»¥åºåˆ—åŒ–
+    [SerializeField] private int attackedRange;                     //æ”»å‡»èŒƒå›´
 
-    
-    private IDeath targetDeath;                                     //Ä¿±êµÄËÀÍöÊÂ¼ş½Ó¿Ú£¬ÔÚLinkedTarget·½·¨ÖĞ¸üĞÂ£¬TargetChange·½·¨ÖĞÊ¹ÓÃ
+    [SerializeField] private int VerticalSpeed;                     //ä¿¯ä»°é€Ÿåº¦
+    [SerializeField] private float verticalAngleUp;                 //ä»°è§’
+    [SerializeField] private float verticalAngleDown;               //ä¿¯è§’
+    [SerializeField] private int horizontalSpeed;                   //è½¬å¼¯é€Ÿåº¦
+    [SerializeField] private int horizontalAngle;                   //æ¨ªå‘è½¬å¼¯è§’åº¦
+    private Quaternion Xturn;                                       //ç›®æ ‡æ¨ªå‘è½¬å¼¯
+    private Quaternion Yturn;                                       //ç›®æ ‡çºµå‘è½¬å¼¯
 
-    public LayerMask layer;                                         //ĞèÒª¼ì²âµÄÄ¿±êµÄ²ã¼¶£¬ÔÚinspector´°¿ÚÒıÓÃ
+    private Coroutine ieRayTargetCoroutine;                                    //ç‚®å¡”å°„çº¿æ˜¯å¦è¢«é˜»æŒ¡ï¼ˆç”¨äºåç¨‹çš„å°„çº¿æ£€æµ‹ï¼‰
+    private float ieRayDeltatime = 0.3f;                                   //ç‚®å¡”å°„çº¿çš„å‘å°„æ£€æµ‹æ—¶é—´é—´è·
+
+    private IDeath targetDeath;                                     //ç›®æ ‡çš„æ­»äº¡äº‹ä»¶æ¥å£ï¼Œåœ¨LinkedTargetæ–¹æ³•ä¸­æ›´æ–°ï¼ŒTargetChangeæ–¹æ³•ä¸­ä½¿ç”¨
+
+    public LayerMask TargetLayer;                                   //éœ€è¦æ£€æµ‹çš„ç›®æ ‡çš„å±‚çº§ï¼Œåœ¨inspectorçª—å£å¼•ç”¨
+
+    /// <summary>
+    /// æä¾›ç»™å­ç±»ç‚®å¡”ï¼Œåœ¨å¼€ç«å‰æœ‰ç‰¹æ®Šéœ€æ±‚çš„è¿›è¡Œæ³¨å†Œï¼Œè¿”å›å€¼è¡¨ç¤ºç‰¹æ®Šè¡Œä¸ºæ˜¯å¦æ‰§è¡Œå®Œæˆ
+    /// </summary>
+    protected Func<bool> BeforeFireFunction;
+    /// <summary>
+    /// æä¾›ç»™å­ç±»ç‚®å¡”ï¼Œåœ¨åœæ­¢å¼€ç«åæœ‰ç‰¹æ®Šéœ€æ±‚çš„è¿›è¡Œæ³¨å†Œ
+    /// </summary>
+    protected UnityAction StopFireAction;
 
 
-    //³õÊ¼»¯·½·¨
+    //åˆå§‹åŒ–æ–¹æ³•
     public void Init<Y>(Y info) where Y : InfoData
     {
         TurretInfo Info = info as TurretInfo;
@@ -43,14 +58,14 @@ public class TurretBase : MonoBehaviour, IInit, IGetRange
         this.horizontalAngle = Info.horizontalAngle;
     }
 
-    private void Awake()
+    protected virtual void Awake()
     {
-        //µÃµ½ÅÚ¿Ú³õÊ¼Ä¬ÈÏ½Ç¶È
+        //å¾—åˆ°ç‚®å£åˆå§‹é»˜è®¤è§’åº¦
         Vector3 forwardAngle = new Vector3(pitchObject.forward.x, 0, pitchObject.forward.z);
         pitchIdentity = Vector3.Angle(forwardAngle, pitchObject.forward);
 
-        TurretInfo info = GameDataMgr.Instance.turretInfos[0];                                      //ÁÙÊ±²âÊÔ
-        Init<TurretInfo>(info);                                                                     //ÁÙÊ±²âÊÔ
+        TurretInfo info = GameDataMgr.Instance.turretInfos[0];                                      //ä¸´æ—¶æµ‹è¯•
+        Init<TurretInfo>(info);                                                                     //ä¸´æ—¶æµ‹è¯•
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -64,38 +79,40 @@ public class TurretBase : MonoBehaviour, IInit, IGetRange
         BehaviourFlow();
     }
 
-    #region Ñ°µĞ¹¥»÷Á÷³Ì
+    #region å¯»æ•Œæ”»å‡»æµç¨‹
     private void BehaviourFlow()
     {
-        //µ±Ç°ÎŞÄ¿±ê£¬½øÈëÑ°µĞÁ÷³Ì
+        //å½“å‰æ— ç›®æ ‡ï¼Œè¿›å…¥å¯»æ•Œæµç¨‹
         if (targetObj == null)
         {
-            Debug.Log("µ±Ç°ÎŞÄ¿±ê£¬½øÈëÑ°µĞÁ÷³Ì");
+            Debug.Log("å½“å‰æ— ç›®æ ‡ï¼Œè¿›å…¥å¯»æ•Œæµç¨‹");
+
+            StopFireAction?.Invoke();
 
             FindTargetFlow();
         }
-        //µ±Ç°ÓĞÄ¿±ê£¬½øÈë¹¥»÷Á÷³Ì
+        //å½“å‰æœ‰ç›®æ ‡ï¼Œè¿›å…¥æ”»å‡»æµç¨‹
         else
         {
-            Debug.Log($"µ±Ç°ÓĞÄ¿±ê:{targetObj.name}½øÈë¹¥»÷Á÷³Ì");
+            Debug.Log($"å½“å‰æœ‰ç›®æ ‡:{targetObj.name}è¿›å…¥æ”»å‡»æµç¨‹");
             AtkFlow();
         }
     }
 
     /// <summary>
-    /// Ñ°µĞÁ÷³Ì
+    /// å¯»æ•Œæµç¨‹
     /// </summary>
     private void FindTargetFlow()
     {
-        //³¢ÊÔ»ñÈ¡Ä¿±ê
+        //å°è¯•è·å–ç›®æ ‡
         if (!TryGetTargetObj(out GameObject obj)) return;
-        //¸Ä±äÄ¿±ê
+        //æ”¹å˜ç›®æ ‡
         TargetChange(obj);
     }
 
-    #region »ñÈ¡Ä¿±ê
+    #region è·å–ç›®æ ‡
     /// <summary>
-    /// ³¢ÊÔ»ñÈ¡Ä¿±ê
+    /// å°è¯•è·å–ç›®æ ‡
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
@@ -103,137 +120,189 @@ public class TurretBase : MonoBehaviour, IInit, IGetRange
     {
         HashSet<GameObject> objects = roomCheck.ProvideTargets();
 
-        //µ÷ÊÔ
+        //è°ƒè¯•
         foreach (var objs in objects)
         {
             Debug.DrawLine(transform.position, objs.transform.position, Color.blue);
         }
 
-        //É¸Ñ¡
+        //ç­›é€‰
         obj = TargetChoose(objects);
-        //Èç¹ûÃ»ÓĞµÃµ½Ä¿±ê
+        //å¦‚æœæ²¡æœ‰å¾—åˆ°ç›®æ ‡
         if (obj == null) return false;
-
+        //è·å¾—ç›®æ ‡åå¾—åˆ°ç›®æ ‡èº«ä¸Šçš„Octreeè„šæœ¬ç”¨äºè·å–ç‰©ä½“çš„ç©ºé—´å±æ€§æ¥ç„å‡†
+        //å¹¶å¼€å¯åç¨‹ï¼Œæ¯éš”ieRayDeltatimeå‘å°„ä¸€æ¬¡å°„çº¿è¿›è¡Œæ£€æµ‹
+        targetMono = obj.GetComponent<OctreeMono>();
+        if (ieRayTargetCoroutine != null) StopCoroutine(ieRayTargetCoroutine);
+        ieRayTargetCoroutine = StartCoroutine(IERayToTarget());
         return true;
     }
 
     /// <summary>
-    /// É¸Ñ¡Ä¿±ê
+    /// ç­›é€‰ç›®æ ‡
     /// </summary>
-    /// <param name="objects">ÖÜÎ§µÄÎïÌåµÄ¼¯ºÏ</param>
+    /// <param name="objects">å‘¨å›´çš„ç‰©ä½“çš„é›†åˆ</param>
     private GameObject TargetChoose(HashSet<GameObject> objects)
     {
-        //ÉùÃ÷Ô¤Ñ¡ÎïÌåµÄÔª×é
+        //å£°æ˜é¢„é€‰ç‰©ä½“çš„å…ƒç»„
         (GameObject, float) resverPair = (null, float.MaxValue);
-        //´¦ÀíËùÓĞÎïÌå
+        //å¤„ç†æ‰€æœ‰ç‰©ä½“
         foreach (GameObject obj in objects)
         {
-            //¸ù¾İ²ã¼¶ÒªÇóÉ¸Ñ¡
+            //æ ¹æ®å±‚çº§è¦æ±‚ç­›é€‰
             int layerNum = 1 << obj.layer;
-            if ((layer & layerNum) != 0)
+            if ((TargetLayer & layerNum) != 0)
             {
-                targetMono = obj.GetComponent<OctreeMono>();                                      //ĞŞ¸Ä
-                if (!TargetKeep(targetMono.bounds.center, out float distance)) continue;
-                //Ñ¡Ôñ·ûºÏÒªÇóµÄÎïÌåÖĞµÄ£¬¾àÀë×î½üµÄ
-                if (distance < resverPair.Item2) resverPair = (obj, distance);
+                if (!TargetKeep(obj.transform.position, out float distance)) continue;
+                //é€‰æ‹©ç¬¦åˆè¦æ±‚çš„ç‰©ä½“ä¸­çš„ï¼Œè·ç¦»æœ€è¿‘çš„,ä¸”æ²¡æœ‰è¢«é®æŒ¡çš„ç‰©ä½“
+                if (distance < resverPair.Item2 && RayToTatget(obj.transform)) resverPair = (obj, distance);
             }
         }
+        
         return resverPair.Item1;
+    }
+    /// <summary>
+    /// ç«‹åˆ»å‘æŒ‡å®šç›®æ ‡å‘å°„çƒå½¢å°„çº¿ï¼Œå¹¶æ£€æµ‹æ˜¯å¦æœ‰é®æŒ¡
+    /// </summary>
+    /// <returns>falseï¼šå­˜åœ¨é®æŒ¡</returns>
+    private bool RayToTatget(Transform obj)
+    {
+        Vector3 position = transform.position;
+        int rayTimes = 5;
+        while (rayTimes > 0)
+        {
+            Vector3 dir = (obj.position - transform.position).normalized;
+            float distance = Vector3.Distance(position, obj.position);
+            if (distance < 0.01f) return false;
+            if (Physics.SphereCast(position, 0.1f, dir, out RaycastHit hitInfo, distance))
+            {
+                Transform tf = hitInfo.collider.transform;
+                if (hitInfo.collider.gameObject == gameObject || tf.IsChildOf(gameObject.transform))
+                {
+                    position = hitInfo.point + dir * 0.01f;
+                    rayTimes--;
+                    continue;
+                }
+                return tf.root == obj.root;
+            }
+            else return false;
+        }
+        Debug.Log("ç‚®å¡”åšåº¦è¶…è¿‡äº†æ­£å¸¸çŠ¶æ€");
+        return false;
+    }
+    /// <summary>
+    /// å¾—åˆ°ç›®æ ‡åå†TryGetObjä¸­å¼€å¯ï¼Œåœ¨TargetChangeä¸­å…³é—­
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator IERayToTarget()
+    {
+        yield return new WaitForSeconds(ieRayDeltatime);
+        if (!RayToTatget(targetObj.transform))
+        {
+            TargetChange(null);
+        }
     }
 
 
     /// <summary>
-    /// ¸Ä±äÄ¿±ê
+    /// æ”¹å˜ç›®æ ‡
     /// </summary>
-    /// <param name="obj">ĞÂµÄÄ¿±ê</param>
-    /// ÅÚËş³ÖĞø¼ì²âÄ¿±êÎ»ÖÃ£¬ÈôÄ¿±êÀë¿ª¹¥»÷·¶Î§£¬Ôò´«Èë¿ÕÄ¿±ê
+    /// <param name="obj">æ–°çš„ç›®æ ‡</param>
+    /// ç‚®å¡”æŒç»­æ£€æµ‹ç›®æ ‡ä½ç½®ï¼Œè‹¥ç›®æ ‡ç¦»å¼€æ”»å‡»èŒƒå›´ï¼Œåˆ™ä¼ å…¥ç©ºç›®æ ‡
     private void TargetChange(GameObject obj)
     {
-        //Èç¹ûÖ»ÊÇÒòÎªÄ¿±êÀë¿ªÁË¹¥»÷·¶Î§
+        //å¦‚æœåªæ˜¯å› ä¸ºç›®æ ‡ç¦»å¼€äº†æ”»å‡»èŒƒå›´
+        
         if (obj == null)
         {
+            if (ieRayTargetCoroutine != null)StopCoroutine(ieRayTargetCoroutine);       //ç«‹åˆ»åœæ­¢å°„çº¿æ£€æµ‹
             targetObj = null;
-            //Ö÷¶¯×¢ÏúÎïÌåµÄËÀÍöÊÂ¼ş
-            targetDeath.UnsubscribeDeathEvent(TargetDead);
-            Debug.Log("Ä¿±êÀë¿ª¹¥»÷·¶Î§");                                                          //µ÷ÊÔ
+            //ä¸»åŠ¨æ³¨é”€ç‰©ä½“çš„æ­»äº¡äº‹ä»¶
+            if (targetDeath != null) targetDeath.UnsubscribeDeathEvent(TargetDead);
+            Debug.Log("ç›®æ ‡ç¦»å¼€æ”»å‡»èŒƒå›´");                                                          //è°ƒè¯•
             return;
         }
-        //Ä¿±êËÀÍöºó£¬ËÀÍöÊÂ¼ş²»ĞèÒª×¢Ïú£¬Ä¿±êËÀÍö×Ô»á×¢ÏúËùÓĞÊÂ¼ş
-
-        //Ñ¡ÖĞĞÂÄ¿±ê
+        //ç›®æ ‡æ­»äº¡åï¼Œæ­»äº¡äº‹ä»¶ä¸éœ€è¦æ³¨é”€ï¼Œç›®æ ‡æ­»äº¡è‡ªä¼šæ³¨é”€æ‰€æœ‰äº‹ä»¶
+        targetDeath = null;
+        //é€‰ä¸­æ–°ç›®æ ‡
         targetObj = obj;
-        //¶©ÔÄĞÂÄ¿±êµÄËÀÍöÊÂ¼ş
+        //è®¢é˜…æ–°ç›®æ ‡çš„æ­»äº¡äº‹ä»¶
         LinkedTarget(obj);
     }
 
     private void LinkedTarget(GameObject obj)
     {
         targetDeath = obj.GetComponent<IDeath>();
-        //¶©ÔÄÄ¿±êµÄËÀÍöÊÂ¼ş
+        //è®¢é˜…ç›®æ ‡çš„æ­»äº¡äº‹ä»¶
         targetDeath.SubscribeDeathEvent(TargetDead);
     }
 
     /// <summary>
-    /// Ä¿±êËÀÍö
+    /// ç›®æ ‡æ­»äº¡
     /// </summary>
     private void TargetDead()
     {
-        //ÖÃ¿ÕÄ¿±ê£¬×Ô¶¯ÔÚupdateº¯ÊıÖĞ½øÈëÑ°Â·Âß¼­
-        targetObj = null;
-        Debug.Log("Ä¿±êËÀÍö");                                                              //µ÷ÊÔ
+        //ç½®ç©ºç›®æ ‡ï¼Œè‡ªåŠ¨åœ¨updateå‡½æ•°ä¸­è¿›å…¥å¯»è·¯é€»è¾‘
+        TargetChange(null);
+        Debug.Log("ç›®æ ‡æ­»äº¡");                                                              //è°ƒè¯•
     }
 
     #endregion
 
-    #region ¹¥»÷Á÷³Ì
+    #region æ”»å‡»æµç¨‹
     /// <summary>
-    /// ¹¥»÷Á÷³Ì
+    /// æ”»å‡»æµç¨‹
     /// </summary>
-    private void AtkFlow()
+    protected virtual void AtkFlow()
     {
-        //¼ìÑéÄ¿±ê£¬²¢¼ÆËã³öÅÚËşµÄĞı×ª£¬¸³Öµ¸øXturnºÍYturn£¬ÓÃÓÚÏÂÃæĞı×ªµÄ²ÎÊı»ñÈ¡£¬´Ë´¦distanceÎŞÓÃ
-        if (!TargetKeep(targetMono.bounds.center, out float distance))                       //ĞŞ¸Ä
+        //æ£€éªŒç›®æ ‡ï¼Œå¹¶è®¡ç®—å‡ºç‚®å¡”çš„æ—‹è½¬ï¼Œèµ‹å€¼ç»™Xturnå’ŒYturnï¼Œç”¨äºä¸‹é¢æ—‹è½¬çš„å‚æ•°è·å–ï¼Œæ­¤å¤„distanceæ— ç”¨
+        if (!TargetKeep(targetMono.bounds.center, out float distance))                       //ä¿®æ”¹
         {
             TargetChange(null);
+            //åœæ­¢æ’­æ”¾å¼€ç«å£°éŸ³ï¼›
+            atkBehaviour.FireSoundStop();                                                    //ä¿®æ”¹
             return;
         }
-        //ÅÚËş×ªÏòÄ¿±ê
+        //ç‚®å¡”è½¬å‘ç›®æ ‡
         DirectionSplit();
-        //¿ªÊ¼¹¥»÷
-        Attacked();                                                            
+        //å¼€å§‹æ”»å‡»
+        Attacked();
     }
 
     /// <summary>
-    /// ¼ì²âÄ¿±êÊÇ·ñ·ûºÏÌõ¼ş
+    /// æ£€æµ‹ç›®æ ‡æ˜¯å¦ç¬¦åˆæ¡ä»¶
     /// </summary>
     /// <returns></returns>
     private bool TargetKeep(Vector3 objPosition, out float distance)
     {
-        distance = Vector3.Distance(objPosition, transform.position) * 2;                       //µ÷ÊÔ£¬¾àÀë
+        distance = Vector3.Distance(objPosition, transform.position) * 2;                       //è°ƒè¯•ï¼Œè·ç¦»
         if (distance > attackedRange)
         {
-            Debug.Log("¾àÀëÌ«Ô¶");
+            Debug.Log("è·ç¦»å¤ªè¿œ");
 
             return false;
         }
 
-        //¼ì²âÄ¿±êÎ»ÖÃ,Èç¹ûÄ¿±êÀë¿ª¹¥»÷·¶Î§Ôòµ÷ÓÃTargetChange´«Èë¿ÕÄ¿±ê,ÖØĞÂ¿ªÊ¼Ñ°Â·
+        //æ£€æµ‹ç›®æ ‡ä½ç½®,å¦‚æœç›®æ ‡ç¦»å¼€æ”»å‡»èŒƒå›´åˆ™è°ƒç”¨TargetChangeä¼ å…¥ç©ºç›®æ ‡,é‡æ–°å¼€å§‹å¯»è·¯
         if (!TurretAngleCalculation(objPosition, yawObject, pitchObject)) return false;
         return true;
     }
 
     protected void Attacked()
     {
-        atkBehaviour.StartFire(targetMono);                         //ÒªĞŞ¸Ä
+        //å¼€ç«å‰çš„ç‰¹æ®Šç‚®å¡”è¡¨ç°
+        bool canAtk = true;
+        if (BeforeFireFunction != null) canAtk = BeforeFireFunction.Invoke();
+        if (canAtk) atkBehaviour.StartFire(targetMono);//å‡†å¤‡å®Œæ¯•æˆ–è€…æ²¡æœ‰ç‰¹æ®Šè¡¨ç°å°±å¯ä»¥å¼€ç«
     }
 
     #endregion
 
-    #region ÅÚÌ¨Ğı×ª
+    #region ç‚®å°æ—‹è½¬
     /// <summary>
-    /// ·½Ïò·Ö±ğ½øĞĞĞı×ª
+    /// æ–¹å‘åˆ†åˆ«è¿›è¡Œæ—‹è½¬
     /// </summary>
-    /// <param name="direction">Ä¿±êÎ»ÖÃ</param>
+    /// <param name="direction">ç›®æ ‡ä½ç½®</param>
     public void DirectionSplit()
     {
         HorizontalTurn(Xturn, yawObject);
@@ -241,48 +310,48 @@ public class TurretBase : MonoBehaviour, IInit, IGetRange
         VerticalTurn(Yturn, pitchObject);
     }
     /// <summary>
-    /// ¼ì²âÆ«×ª½Ç¶ÈÊÇ·ñ³¬¹ı½çÏŞ
+    /// æ£€æµ‹åè½¬è§’åº¦æ˜¯å¦è¶…è¿‡ç•Œé™
     /// </summary>
-    /// <param name="targetPostion">Ä¿±êÎ»ÖÃ</param>
-    /// <param name="Xturnobj">ºáÏòÆ«×ªÎïÌå</param>
-    /// <param name="Yturnobj">¸©ÑöÆ«×ªÎïÌå</param>
+    /// <param name="targetPostion">ç›®æ ‡ä½ç½®</param>
+    /// <param name="Xturnobj">æ¨ªå‘åè½¬ç‰©ä½“</param>
+    /// <param name="Yturnobj">ä¿¯ä»°åè½¬ç‰©ä½“</param>
     /// <returns></returns>
     private bool TurretAngleCalculation(Vector3 targetPostion, Transform Xturnobj, Transform Yturnobj)
     {
-        //ÅĞ¶ÏºáÏòÆ«×ª
+        //åˆ¤æ–­æ¨ªå‘åè½¬
         Vector3 Xdirection = (targetPostion - Xturnobj.position).normalized;
         Xdirection.y = 0;
-        //·ÀÖ¹³öÏÖÒì³£Ğı×ª
+        //é˜²æ­¢å‡ºç°å¼‚å¸¸æ—‹è½¬
         if (Xdirection.sqrMagnitude < 0.001f) return false;
-        //Èç¹û³¬¹ıºáÏò½çÏŞ
+        //å¦‚æœè¶…è¿‡æ¨ªå‘ç•Œé™
         if (Vector3.Angle(transform.forward, Xdirection) > horizontalAngle / 2)
         {
-            Debug.Log("ºáÏòÔ½½ç");
+            Debug.Log("æ¨ªå‘è¶Šç•Œ");
             return false;
         }
-        
 
-        //ÅĞ¶Ï×İÏòÆ«×ª
+
+        //åˆ¤æ–­çºµå‘åè½¬
         Vector3 localTarget = targetPostion - Yturnobj.position;
-        // Í¶Ó°µ½xzÆ½Ãæ
+        // æŠ•å½±åˆ°xzå¹³é¢
         Vector3 localTargetXZ = new Vector3(localTarget.x, 0, localTarget.z);
         if (localTargetXZ.sqrMagnitude < 0.001f) return false;
-        // ¼ÆËãĞèÒªĞı×ªµÄ´¹Ö±½Ç¶È£¨Ïà¶ÔÓÚ¾Ö²¿XÖá£©Quaternion.Euler(0 , 90, 0) * localTargetXZ
+        // è®¡ç®—éœ€è¦æ—‹è½¬çš„å‚ç›´è§’åº¦ï¼ˆç›¸å¯¹äºå±€éƒ¨Xè½´ï¼‰Quaternion.Euler(0 , 90, 0) * localTargetXZ
         float verticalAngle = Vector3.SignedAngle(localTargetXZ, localTarget, Quaternion.Euler(0, 90, 0) * localTargetXZ);
         if (-verticalAngleDown < verticalAngle || -verticalAngleUp > verticalAngle)
         {
-            Debug.Log("×İÏòÏòÔ½½ç");
+            Debug.Log("çºµå‘å‘è¶Šç•Œ");
             return false;
         }
 
-        //×îºó,Ìõ¼ş¶¼Âú×ãµÄÇé¿öÏÂ£¬¸³Öµ´æ´¢
+        //æœ€å,æ¡ä»¶éƒ½æ»¡è¶³çš„æƒ…å†µä¸‹ï¼Œèµ‹å€¼å­˜å‚¨
         Xturn = Quaternion.LookRotation(Xdirection, Vector3.up);
         Yturn = Quaternion.Euler(verticalAngle, 0, 0);
-        return true;                                                                               
+        return true;
 
     }
     /// <summary>
-    /// ÅÚÌ¨ºáÏòÆ«×ª
+    /// ç‚®å°æ¨ªå‘åè½¬
     /// </summary>
     private void HorizontalTurn(Quaternion quaternion, Transform turnobj)
     {
@@ -291,31 +360,31 @@ public class TurretBase : MonoBehaviour, IInit, IGetRange
     }
 
     /// <summary>
-    /// ÅÚ¿Ú¸©ÑöÆ«×ª
+    /// ç‚®å£ä¿¯ä»°åè½¬
     /// </summary>
     /// <param name="q"></param>
     public void VerticalTurn(Quaternion targetRotation, Transform turnobj)
     {
-        #region Å×Æú
+        #region æŠ›å¼ƒ
         // Vector3 localTarget = targetPostion - turnobj.position;
-        // // Í¶Ó°µ½xzÆ½Ãæ
+        // // æŠ•å½±åˆ°xzå¹³é¢
         // Vector3 localTargetXZ = new Vector3(localTarget.x, 0, localTarget.z);
         // if (localTargetXZ == Vector3.zero) return;
-        // // ¼ÆËãĞèÒªĞı×ªµÄ´¹Ö±½Ç¶È£¨Ïà¶ÔÓÚ¾Ö²¿XÖá£©Quaternion.Euler(0 , 90, 0) * localTargetXZ
+        // // è®¡ç®—éœ€è¦æ—‹è½¬çš„å‚ç›´è§’åº¦ï¼ˆç›¸å¯¹äºå±€éƒ¨Xè½´ï¼‰Quaternion.Euler(0 , 90, 0) * localTargetXZ
         // float verticalAngle = Vector3.SignedAngle(localTargetXZ, localTarget, Quaternion.Euler(0, 90, 0) * localTargetXZ);
-        // // ÏŞÖÆ½Ç¶È·¶Î§
+        // // é™åˆ¶è§’åº¦èŒƒå›´
         // verticalAngle = Mathf.Clamp(verticalAngle, -verticalAngleUp, verticalAngleDown);
-        // //½öÈÆ¾Ö²¿XÖá´´½¨Ğı×ªËÄÔªÊı
+        // //ä»…ç»•å±€éƒ¨Xè½´åˆ›å»ºæ—‹è½¬å››å…ƒæ•°
         // Quaternion targetRotation = Quaternion.Euler(verticalAngle, 0, 0);
-        //ÔÈËÙĞı×ª
+        //åŒ€é€Ÿæ—‹è½¬
         #endregion
 
         turnobj.localRotation = Quaternion.RotateTowards(turnobj.localRotation, targetRotation, VerticalSpeed * Time.deltaTime);
 
 
-        // »æÖÆ¾Ö²¿Ç°·½Ïò£¨ºìÉ«£©                                                      µ÷ÊÔ
+        // ç»˜åˆ¶å±€éƒ¨å‰æ–¹å‘ï¼ˆçº¢è‰²ï¼‰                                                      è°ƒè¯•
         Debug.DrawRay(turnobj.position, turnobj.forward * 10, Color.red);
-        //Ä¿±ê·½Ïò£¨ÂÌÉ«£©£¬»ù×¼Ë®Æ½Ïß£¨À¶É«£© 
+        //ç›®æ ‡æ–¹å‘ï¼ˆç»¿è‰²ï¼‰ï¼ŒåŸºå‡†æ°´å¹³çº¿ï¼ˆè“è‰²ï¼‰ 
         // Debug.DrawRay(turnobj.position, localTargetXZ, Color.blue);
         // Debug.DrawRay(turnobj.position, targetPostion, Color.green);
 

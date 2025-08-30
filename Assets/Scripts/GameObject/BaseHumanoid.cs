@@ -6,20 +6,20 @@ public abstract class BaseHumanoid<T, Y> : MonoBehaviour, IDeath where T : Attac
     public int health;
     public int maxHealth;
     public int def;
-    public T atkComponent;   //inspector´°¿ÚÒıÓÃ
-    public Y moveComponet;   //inspector´°¿ÚÒıÓÃ
-    public GameObject bodyRigRoot;      //ÉíÌåÖ÷Ìå×Ó½Úµã£¬ÓÃÀ´°ó¶¨characterController
+    public T atkComponent;   //inspectorçª—å£å¼•ç”¨
+    public Y moveComponet;   //inspectorçª—å£å¼•ç”¨
+    public GameObject bodyRigRoot;      //èº«ä½“ä¸»ä½“å­èŠ‚ç‚¹ï¼Œç”¨æ¥ç»‘å®šcharacterController
 
     [HideInInspector]
     public CharacterController controller;
 
-    public UnityEvent DeadEvent;    //½ÇÉ«ËÀÍöÊÂ¼ş£¬·½±ã¼¯ÖĞ´¦ÀíÈËÎïÄ£¿éÄÚµÄ½Å±¾µÄ×¢²áºÍ×¢Ïú
+    public UnityEvent DeadEvent;    //è§’è‰²æ­»äº¡äº‹ä»¶ï¼Œæ–¹ä¾¿é›†ä¸­å¤„ç†äººç‰©æ¨¡å—å†…çš„è„šæœ¬çš„æ³¨å†Œå’Œæ³¨é”€
 
-    //³õÊ¼»¯ÔÚ¹¤³§Íê³É
+    //åˆå§‹åŒ–åœ¨å·¥å‚å®Œæˆ
 
     public virtual void Awake()
     {
-        //controller×é¼ş
+        //controllerç»„ä»¶
         controller = bodyRigRoot.GetComponent<CharacterController>();
 
     }
@@ -30,7 +30,7 @@ public abstract class BaseHumanoid<T, Y> : MonoBehaviour, IDeath where T : Attac
 
     protected virtual void OnDisable()
     {
-        //ÒÆ³ıËùÓĞÊÂ¼ş¼àÌı
+        //ç§»é™¤æ‰€æœ‰äº‹ä»¶ç›‘å¬
         DeadEvent.RemoveAllListeners();
     }
     private void controllerLose()
@@ -38,9 +38,9 @@ public abstract class BaseHumanoid<T, Y> : MonoBehaviour, IDeath where T : Attac
         controller.enabled = false;
     }
 
-    #region ½Ó¿ÚÊµÏÖÄÚÈİ:IDeath
+    #region æ¥å£å®ç°å†…å®¹:IDeath
     /// <summary>
-    /// Ìá¹©¸øÍâ½ç¶©ÔÄÎïÌåËÀÍöÊÂ¼ş
+    /// æä¾›ç»™å¤–ç•Œè®¢é˜…ç‰©ä½“æ­»äº¡äº‹ä»¶
     /// </summary>
     public void SubscribeDeathEvent(UnityAction action)
     {
@@ -53,29 +53,29 @@ public abstract class BaseHumanoid<T, Y> : MonoBehaviour, IDeath where T : Attac
     #endregion  
 
 }
-//ÀàÈËÉúÎïËÀÍö¶¯»­Ïà¹Ø
+//ç±»äººç”Ÿç‰©æ­»äº¡åŠ¨ç”»ç›¸å…³
 public interface IHumanoidAnimation
 {
-    //ËÀÍö¶¯»­·½·¨
+    //æ­»äº¡åŠ¨ç”»æ–¹æ³•
     public void DeadAnimation();
 
-    //ËÀÍö¶¯»­»Øµ÷·½·¨
+    //æ­»äº¡åŠ¨ç”»å›è°ƒæ–¹æ³•
     public void DeadAnimationComplete();
 
     public void StateReset();
 }
-//ÉúÃüĞĞÎªÏà¹Ø
+//ç”Ÿå‘½è¡Œä¸ºç›¸å…³
 public interface ILife
 {
-    //ÊÜÉË·½·¨
+    //å—ä¼¤æ–¹æ³•
     public void HealthDecrease(int damage);
 
-    //»ØÑª·½·¨
+    //å›è¡€æ–¹æ³•
     public void HealthIncrease(int value);
 
-    //ËÀÍö·½·¨
+    //æ­»äº¡æ–¹æ³•
     public void Dead();
 
-    //×´Ì¬ÖØÖÃ·½·¨£¨ÓÃÓÚ¶ÔÏó³Øµ÷ÓÃ/»òÕß¸´»î£©
+    //çŠ¶æ€é‡ç½®æ–¹æ³•ï¼ˆç”¨äºå¯¹è±¡æ± è°ƒç”¨/æˆ–è€…å¤æ´»ï¼‰
     public void StateReset();
 }

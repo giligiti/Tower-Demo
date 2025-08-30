@@ -1,26 +1,26 @@
 using System.Collections;
 using UnityEngine;
 
-//ÕâÊÇËùÓĞ·¢ÉäÀàĞÍÎïÌåµÄÍ¨ÓÃ½Å±¾£¬¹ÒÔØÔÚÔ¤ÖÆÌåÉÏ
-//ÒªÔÚinspector´°¿ÚÒıÓÃ×ÔÉíµÄRigibody£¬ÌØĞ§
-//Íâ²¿´«ÈëµÄ·½ÏòĞèÒªÊÇ¹éÒ»»¯ºóµÄÖµ
+//è¿™æ˜¯æ‰€æœ‰å‘å°„ç±»å‹ç‰©ä½“çš„é€šç”¨è„šæœ¬ï¼ŒæŒ‚è½½åœ¨é¢„åˆ¶ä½“ä¸Š
+//è¦åœ¨inspectorçª—å£å¼•ç”¨è‡ªèº«çš„Rigibodyï¼Œç‰¹æ•ˆ
+//å¤–éƒ¨ä¼ å…¥çš„æ–¹å‘éœ€è¦æ˜¯å½’ä¸€åŒ–åçš„å€¼
 [RequireComponent (typeof(Rigidbody))]
 public class BulletProject : MonoBehaviour, IInit,IIgnore
 {
-    [SerializeField] private EffectFactory factory;     //ÌØĞ§¹¤³§
-    private float speed = 50;                           //ËÙ¶È
-    private string bulletName;                          //×Óµ¯µÄ¾ßÌåÃû×Ö
-    public int BulletHitEffID = 0;                      //ÃüÖĞÌØĞ§µÄid//ÕâÓ¦¸ÃÊÇ¶¨ËÀµÄ
-    public float offset = 0.2f;                         //ÌØĞ§´´½¨ÍùÅö×²ÌåÄÚ²¿Ç¶ÈëµÄÉî¶È
+    [SerializeField] private EffectFactory factory;     //ç‰¹æ•ˆå·¥å‚
+    private float speed = 50;                           //é€Ÿåº¦
+    private string bulletName;                          //å­å¼¹çš„å…·ä½“åå­—
+    public int BulletHitEffID = 0;                      //å‘½ä¸­ç‰¹æ•ˆçš„id//è¿™åº”è¯¥æ˜¯å®šæ­»çš„
+    public float offset = 0.2f;                         //ç‰¹æ•ˆåˆ›å»ºå¾€ç¢°æ’ä½“å†…éƒ¨åµŒå…¥çš„æ·±åº¦
 
-     public GameObject fireOrigin;     //·¢ÉäÔ´Í·£¬ÓÃÓÚºöÂÔ×Óµ¯ºÍ·¢ÉäÕßµÄÅö×²
+     public GameObject fireOrigin;     //å‘å°„æºå¤´ï¼Œç”¨äºå¿½ç•¥å­å¼¹å’Œå‘å°„è€…çš„ç¢°æ’
 
     [HideInInspector] public int atk;
     public Rigidbody rb;
     private Transform tf;
-    private bool haveAtk = false;                       //ÊÇ·ñÒÑ¾­Ôì³ÉÒ»´Î¹¥»÷£¿
-    private Coroutine resetCoroutine;                   //»ØÊÕĞ­³Ì
-    private float pushTime = 3;                         //»ØÊÕÊ±¼ä
+    private bool haveAtk = false;                       //æ˜¯å¦å·²ç»é€ æˆä¸€æ¬¡æ”»å‡»ï¼Ÿ
+    private Coroutine resetCoroutine;                   //å›æ”¶åç¨‹
+    private float pushTime = 3;                         //å›æ”¶æ—¶é—´
 
 
     private void Awake()
@@ -33,7 +33,7 @@ public class BulletProject : MonoBehaviour, IInit,IIgnore
     private void OnEnable()
     {
     }
-    //Éú²úÇëÇóÕßÍ¨¹ı¹¤³§µ÷ÓÃ£¬ÊµÏÖ×Óµ¯¹¥»÷Á¦¡¢¹¥»÷·½Ïò³õÊ¼»¯£¬Ö´ĞĞ²¢·¢Éä
+    //ç”Ÿäº§è¯·æ±‚è€…é€šè¿‡å·¥å‚è°ƒç”¨ï¼Œå®ç°å­å¼¹æ”»å‡»åŠ›ã€æ”»å‡»æ–¹å‘åˆå§‹åŒ–ï¼Œæ‰§è¡Œå¹¶å‘å°„
     public void Init<T>(T info) where T : InfoData
     {
         GunInfo gunInfo = info as GunInfo;
@@ -41,19 +41,19 @@ public class BulletProject : MonoBehaviour, IInit,IIgnore
         bulletName = gunInfo.bulletName;
         speed = gunInfo.bulletSpeed;
 
-        // ÑØ×Å×Óµ¯µÄÇ°Ïò(forward)Ê©¼ÓÁ¦
+        // æ²¿ç€å­å¼¹çš„å‰å‘(forward)æ–½åŠ åŠ›
         rb.AddForce(tf.forward * speed, ForceMode.VelocityChange);
 
         rb.constraints = RigidbodyConstraints.FreezeRotationX |
                          RigidbodyConstraints.FreezeRotationY |
                          RigidbodyConstraints.FreezeRotationZ;
 
-        resetCoroutine = StartCoroutine(PushBack()); // ÈıÃëºó×Ô¶¯»ØÊÕ×Óµ¯
+        resetCoroutine = StartCoroutine(PushBack()); // ä¸‰ç§’åè‡ªåŠ¨å›æ”¶å­å¼¹
 
     }
 
     /// <summary>
-    /// µÃµ½·¢ÉäÕß
+    /// å¾—åˆ°å‘å°„è€…
     /// </summary>
     /// <param name="obj"></param>
     public void ToIgnore(GameObject obj)
@@ -64,8 +64,8 @@ public class BulletProject : MonoBehaviour, IInit,IIgnore
     private void OnCollisionEnter(Collision collision)
     {
         Transform ctf = collision.transform;
-        //ºöÂÔÍ¬²ã¼¶ÎïÌå,Í¬²ã¼¶ÎïÌå²»ÄÜÅö×²
-        //ºöÂÔ·¢ÉäÔ´Í·
+        //å¿½ç•¥åŒå±‚çº§ç‰©ä½“,åŒå±‚çº§ç‰©ä½“ä¸èƒ½ç¢°æ’
+        //å¿½ç•¥å‘å°„æºå¤´
         if (fireOrigin != null && (ctf.gameObject == fireOrigin || ctf.IsChildOf(fireOrigin.transform))) return;
 
         ILife obj = ctf.GetComponentInParent<ILife>();
@@ -75,9 +75,9 @@ public class BulletProject : MonoBehaviour, IInit,IIgnore
             haveAtk = true;
             Debug.Log(1);
         }
-        ContactPoint point = collision.GetContact(0);//»ñÈ¡µÚÒ»¸öÅö×²µã
+        ContactPoint point = collision.GetContact(0);//è·å–ç¬¬ä¸€ä¸ªç¢°æ’ç‚¹
 
-        //Ïò¹¤³§ÇëÇó×Óµ¯ÃüÖĞÌØĞ§¶ÔÏó
+        //å‘å·¥å‚è¯·æ±‚å­å¼¹å‘½ä¸­ç‰¹æ•ˆå¯¹è±¡
         GameObject eft = factory.Create(point.point - point.normal * offset, Quaternion.LookRotation(point.normal));
 
         ReclearSelf();
@@ -89,15 +89,15 @@ public class BulletProject : MonoBehaviour, IInit,IIgnore
         ReclearSelf();
     }
 
-    #region ×´Ì¬ÖØÖÃ
+    #region çŠ¶æ€é‡ç½®
 
     private void ReclearSelf()
     {
-        //ÃâµÃ»ØÊÕĞ­³Ìµ÷ÓÃ
+        //å…å¾—å›æ”¶åç¨‹è°ƒç”¨
         if (gameObject.activeSelf)
         {
             ResetBullet();
-            //»ØÊÕ×Ô¼º
+            //å›æ”¶è‡ªå·±
             PoolMgr.Instance.PushObject<BulletPoolData>(bulletName, this.gameObject);
         }
     }

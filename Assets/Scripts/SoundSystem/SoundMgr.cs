@@ -11,12 +11,12 @@ public class SoundMgr : MonoBehaviour
     //音效播放器
     private AudioSource soundSource;
     //存储在挂载在物体上的音效播放器
-    private HashSet<AudioSource> setObjAudio = new HashSet<AudioSource>();
+    private HashSet<AudioSource> objAudioSet = new HashSet<AudioSource>();
     //存储加载出来的音乐:背景音乐，UI音效等
     private Dictionary<E_SoundClip, AudioClip> dicAudio = new Dictionary<E_SoundClip, AudioClip>();
     //存储加载出来的音乐的路径
     List<SoundInfo> soundDatas = new List<SoundInfo>();
-    //通过加载得到的全局声音数据
+    //通过加载得到的全局声音设置数据
     private MusicData musicData;
     public MusicData MusicData => musicData;
     //对象池加载声音物体的数量
@@ -30,7 +30,7 @@ public class SoundMgr : MonoBehaviour
 
         audioSource = this.gameObject.AddComponent<AudioSource>();//BGM
         soundSource = this.gameObject.AddComponent<AudioSource>();//音效
-        setObjAudio.Add(soundSource);
+        objAudioSet.Add(soundSource);
         DontDestroyOnLoad(this);
 
         musicData = JsonMgr.Instance.LoadData<MusicData>("MusicData");
@@ -41,8 +41,8 @@ public class SoundMgr : MonoBehaviour
         SetMusicVolume(musicData.musicValue);
         SoundMute(musicData.soundMute);
         MusicMute(musicData.musicMute);
-        
-        //背景音乐开始播放
+
+        //背景音乐由Main类调用播放
         audioSource.loop = true;
     }
     #region SoundPlayer相关
@@ -54,13 +54,13 @@ public class SoundMgr : MonoBehaviour
     {
         //同步当前全局音效状态
         audio.volume = musicData.soundValue;
-        audio.mute = !musicData.soundMute;
-        setObjAudio.Add(audio);//保存到字典中，用于全局静音时使用
+        audio.mute = musicData.soundMute;
+        objAudioSet.Add(audio);//保存到字典中，用于全局静音时使用
 
     }
     public void CleanAudioSource(AudioSource audio)
     {
-        setObjAudio.Remove(audio);
+        objAudioSet.Remove(audio);
     }
     /// <summary>
     /// 检查清除，防止空引用，防止物体未正常在ondestory中注销
@@ -68,7 +68,7 @@ public class SoundMgr : MonoBehaviour
     private void CleanUpADSet()
     {
         List<AudioSource> audioSources = new List<AudioSource>();
-        foreach (var ad in setObjAudio)
+        foreach (var ad in objAudioSet)
         {
             if (ad == null || ad.gameObject == null)
             {
@@ -77,7 +77,7 @@ public class SoundMgr : MonoBehaviour
         }
         foreach (var ad in audioSources)
         {
-            setObjAudio.Remove(ad);
+            objAudioSet.Remove(ad);
         }
     }
 
@@ -145,9 +145,11 @@ public class SoundMgr : MonoBehaviour
     {
         return GetAudio(type);
     }
-    public void StopPlayerSound()
+    public void PlaySound(AudioSource audio, E_SoundClip type)
     {
-
+        AudioClip clip = GetAudio(type);
+        audio.clip = clip;
+        audio.Play();
     }
 
     /// <summary>
@@ -155,12 +157,13 @@ public class SoundMgr : MonoBehaviour
     /// </summary>
     /// <param name="type">具体声音</param>
     /// <param name="position">位置</param>
-    /// <param name="pitch">声音起伏幅度</param>
-    public void PlaySoundObj(E_SoundClip type, Vector3 position, float pitch = 0)
+    /// <param name="pitch">声音起伏幅度（音调音量有0.1的基础起伏）</param>
+    public void PlaySoundObj(E_SoundClip type, Transform father, float pitch = 0)
     {
         GameObject obj = PoolMgr.Instance.GetObject<SoundPoolData>("SoundObj");
         //设置物体
-        obj.transform.position = position;
+        obj.transform.position = father.position;
+        obj.transform.SetParent(father);
         //进行初始化：音效同步，声音起伏;音效组件的初始化在自身挂载的脚本中,设置为不循环、3d音效播放
         AutoRecycleSound atSound = obj.GetComponent<AutoRecycleSound>();
         //声音起伏
@@ -171,8 +174,6 @@ public class SoundMgr : MonoBehaviour
         atSound.PlaySoundOnObj(musicData.soundValue, musicData.soundMute, clip);
     }
 
-
-
     #endregion
 
     #region 管理全局声音相关
@@ -182,7 +183,7 @@ public class SoundMgr : MonoBehaviour
     {
         CleanUpADSet();
         musicData.soundValue = volume;
-        foreach (var ad in setObjAudio)
+        foreach (var ad in objAudioSet)
         {
             ad.volume = volume;
         }
@@ -202,7 +203,7 @@ public class SoundMgr : MonoBehaviour
     {
         CleanUpADSet();
         musicData.soundMute = mute;
-        foreach (var ad in setObjAudio)
+        foreach (var ad in objAudioSet)
         {
             ad.mute = mute;
         }
@@ -228,6 +229,13 @@ public class SoundMgr : MonoBehaviour
         JsonMgr.Instance.SaveData(musicData, "MusicData");
     }
 
+    /// <summary>
+    /// 加载场景的时候清除加载的音效资源的引用
+    /// </summary>
+    private void CleanClipSource()
+    {
+
+    }
 }
 /// <summary>
 /// 表示具体音效资源

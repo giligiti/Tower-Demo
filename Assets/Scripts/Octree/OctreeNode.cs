@@ -149,7 +149,7 @@ namespace Octree
             if (!draw)
                 return false;
 
-            //return draw;
+            return draw;
             //画出节点路径
             Gizmos.color = Color.green;
             Gizmos.DrawWireCube(bounds.center, bounds.size);

@@ -5,46 +5,46 @@ namespace Octree
 {
     public class Octree 
     {
-        public OctreeNode root;         //¸ù½Úµã
-        public Bounds bounds;           //±íÊ¾×î´óµÄ°üÎ§ºĞ
-        private HashSet<OctreeObject> objects;                              //´æ´¢ĞèÒªÖØĞÂ·ÖÅäµÄ½Úµã//µ¥ÀıµÄÊı¾İ
-        private HashSet<OctreeObject> allOtObject;                          //´æ´¢°Ë²æÊ÷ÖĞËùÓĞµÄÎïÌå
+        public OctreeNode root;         //æ ¹èŠ‚ç‚¹
+        public Bounds bounds;           //è¡¨ç¤ºæœ€å¤§çš„åŒ…å›´ç›’
+        private HashSet<OctreeObject> objects;                              //å­˜å‚¨éœ€è¦é‡æ–°åˆ†é…çš„èŠ‚ç‚¹//å•ä¾‹çš„æ•°æ®
+        private HashSet<OctreeObject> allOtObject;                          //å­˜å‚¨å…«å‰æ ‘ä¸­æ‰€æœ‰çš„ç‰©ä½“
 
         public List<OctreeObject> actuallyLeaf;
 
-        //´´½¨¸ù½ÚµãºÍ×î´ó°üÎ§ºĞ
+        //åˆ›å»ºæ ¹èŠ‚ç‚¹å’Œæœ€å¤§åŒ…å›´ç›’
         public Octree(List<GameObject> worldSpace, float minNodeSize)
         {
             CalculateBounds(worldSpace);
             CreateTree(minNodeSize);
             objects = GameDataMgr.Instance.octreeMonos;
-            //°Ñ¸üĞÂ·½·¨×¢²áµ½monoÄ£¿éÖĞ
+            //æŠŠæ›´æ–°æ–¹æ³•æ³¨å†Œåˆ°monoæ¨¡å—ä¸­
             MonoMgr.Instance.AddEventListener(Redivide, E_LifeFunction.update);
 
         }
 
-        //´´½¨¸ù½Úµã
+        //åˆ›å»ºæ ¹èŠ‚ç‚¹
         private void CreateTree(float minNodeSize) => root = new OctreeNode(bounds, minNodeSize);
-        //¼ÆËã¸ù½Úµã°üÎ§ºĞ
+        //è®¡ç®—æ ¹èŠ‚ç‚¹åŒ…å›´ç›’
         private void CalculateBounds(List<GameObject> worldSpace)
         {
-            //Ê¹°üÎ§ºĞÈİÄÉËùÓĞµÄÎïÌå
+            //ä½¿åŒ…å›´ç›’å®¹çº³æ‰€æœ‰çš„ç‰©ä½“
             foreach (var child in worldSpace)
             {
                 bounds.Encapsulate(child.GetComponent<Collider>().bounds);
             }
             worldSpace = null;
-            //Ê¹°üÎ§ºĞ³ÉÎªÕı·½ĞÎ
+            //ä½¿åŒ…å›´ç›’æˆä¸ºæ­£æ–¹å½¢
             Vector3 size = bounds.size;
             Vector3 minSize = Vector3.one * Mathf.Max(size.x, size.y, size.z) * 0.5f;
             bounds.SetMinMax(bounds.center -  minSize, bounds.center + minSize);
             bounds.center = new Vector3(0,minSize.x - 5,0);
         }
 
-        #region °Ë²æÊ÷²åÈë»òÒÆ³ıOctreeObject
+        #region å…«å‰æ ‘æ’å…¥æˆ–ç§»é™¤OctreeObject
 
         /// <summary>
-        /// ĞÂ½Úµã¼ÓÈë°Ë²æÊ÷Ç°ĞèÒª×öµÄ×¼±¸
+        /// æ–°èŠ‚ç‚¹åŠ å…¥å…«å‰æ ‘å‰éœ€è¦åšçš„å‡†å¤‡
         /// </summary>
         /// <param name="otObject"></param>
         private void NewNodeInsertInit(OctreeObject otObject)
@@ -55,7 +55,7 @@ namespace Octree
         }
 
         /// <summary>
-        /// ½Úµã¼ÓÈë´ı²åÈëÁĞ±í
+        /// èŠ‚ç‚¹åŠ å…¥å¾…æ’å…¥åˆ—è¡¨
         /// </summary>
         /// <param name="object"></param>
         public void ReDivide(OctreeObject otObject)
@@ -65,7 +65,7 @@ namespace Octree
         }
 
         /// <summary>
-        /// ½Úµã²åÈë·½·¨
+        /// èŠ‚ç‚¹æ’å…¥æ–¹æ³•
         /// </summary>
         public void Redivide()
         {
@@ -78,7 +78,7 @@ namespace Octree
             objects.Clear();
         }
         /// <summary>
-        /// ½ÚµãÒÆ³ı
+        /// èŠ‚ç‚¹ç§»é™¤
         /// </summary>
         /// <param name="otObject"></param>
         public void RemoveOtObject(OctreeObject otObject)
@@ -87,7 +87,7 @@ namespace Octree
         }
         #endregion
 
-        #region ¿Õ¼ä»®·Ö¼ì²âÏà¹Ø
+        #region ç©ºé—´åˆ’åˆ†æ£€æµ‹ç›¸å…³
 
         public void RoomSearch(Bounds otObj, HashSet<OctreeNode> objectSet)
         {

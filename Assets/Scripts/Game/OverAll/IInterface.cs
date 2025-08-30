@@ -2,19 +2,19 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// ¹¤³§½Ó¿Ú
+/// å·¥å‚æ¥å£
 /// </summary>
 public interface IFactory
 {
     GameObject Create(Vector3 position, Quaternion quaternion);
 }
 /// <summary>
-/// ³õÊ¼»¯½Ó¿Ú£¬Ã¿¸öĞèÒª¹¤³§½øĞĞ³õÊ¼»¯µÄ²úÆ·µÄÖ÷Òª½Å±¾¶¼ĞèÒªÊµÏÖÕâ¸ö½Ó¿Ú
+/// åˆå§‹åŒ–æ¥å£ï¼Œæ¯ä¸ªéœ€è¦å·¥å‚è¿›è¡Œåˆå§‹åŒ–çš„äº§å“çš„ä¸»è¦è„šæœ¬éƒ½éœ€è¦å®ç°è¿™ä¸ªæ¥å£
 /// </summary>
 public interface IInit
 {
     /// <summary>
-    /// ÏÈÊ¹ÓÃ¸¸Àà×°ÔØ£¬¾ßÌåÊµÏÖ½×¶ÎÔÚÀàĞÍ×ª»»³É¾ßÌå×ÓÀà
+    /// å…ˆä½¿ç”¨çˆ¶ç±»è£…è½½ï¼Œå…·ä½“å®ç°é˜¶æ®µåœ¨ç±»å‹è½¬æ¢æˆå…·ä½“å­ç±»
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="info"></param>
@@ -22,7 +22,7 @@ public interface IInit
 }
 
 /// <summary>
-/// ÓÃÓÚµÃµ½Ä³¸öÖµ£¬Ä¿Ç°Ö»ÓÃÓÚOctreeMono½Å±¾µÃµ½¹¥»÷·¶Î§
+/// ç”¨äºå¾—åˆ°æŸä¸ªå€¼ï¼Œç›®å‰åªç”¨äºOctreeMonoè„šæœ¬å¾—åˆ°æ”»å‡»èŒƒå›´
 /// </summary>
 public interface IGetRange
 {
@@ -30,24 +30,37 @@ public interface IGetRange
 }
 
 /// <summary>
-/// ¸øÍâ½çÌá¹©ËÀÍöÊÂ¼ş½Ó¿Ú
+/// ç»™å¤–ç•Œæä¾›æ­»äº¡äº‹ä»¶æ¥å£
 /// </summary>
 public interface IDeath
 {
     /// <summary>
-    /// ¶©ÔÄËÀÍöÊÂ¼ş
+    /// è®¢é˜…æ­»äº¡äº‹ä»¶
     /// </summary>
     /// <param name="action"></param>
     void SubscribeDeathEvent(UnityAction action);
     /// <summary>
-    /// ×¢ÏúËÀÍöÊÂ¼ş
+    /// æ³¨é”€æ­»äº¡äº‹ä»¶
     /// </summary>
     /// <param name="action"></param>
     void UnsubscribeDeathEvent(UnityAction action);
 
 }
-
+/// <summary>
+/// ç”¨äºè®©å­å¼¹åˆ›å»ºè€…å¾—åˆ°å­å¼¹ä¸Šçš„è¿™ä¸ªæ¥å£å¹¶èµ‹äºˆä»–éœ€è¦å¿½ç•¥çš„ç‰©ä½“ï¼ˆåˆ›å»ºè€…è‡ªèº«ï¼‰
+/// </summary>
 public interface IIgnore
 {
     void ToIgnore(GameObject obj);
+}
+
+/// <summary>
+/// åœ¨å¼€ç«å‰å’Œåœæ­¢å¼€ç«åéœ€è¦æœ‰ç‰¹æ®Šè¡¨ç°çš„ç‰©ä½“çš„è„šæœ¬éœ€è¦å®ç°è¿™ä¸ªæ–¹æ³•
+/// </summary>
+/// ç°åœ¨åœ¨åŠ ç‰¹æ—ç‚®å¡”ä¸­ä½¿ç”¨
+/// é»˜è®¤ä¼šåœ¨updateä¸­è°ƒç”¨ï¼Œéœ€è¦åšå¥½å¯¹ç­–
+public interface ISpecialFireHandle
+{
+    public bool BeforeAtk();
+    public void StopAtk();
 }

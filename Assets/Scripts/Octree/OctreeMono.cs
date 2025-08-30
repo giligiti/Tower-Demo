@@ -10,10 +10,12 @@ namespace Octree
         private Vector3 boundsOffset;
         
         protected Vector3 lastPosition = new Vector3();
+        //表示当前物体是否死亡，便于脱离检测系统
         public bool isDead = false;
 
         private void Awake()
         {
+            //尝试订阅当前物体的死亡事件
             TryGetIDeath();
         }
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -96,7 +98,6 @@ namespace Octree
         }
         protected virtual void OnDisable()
         {
-            Debug.Log($"{gameObject.name} 的 OnDisable 被调用！组件是否启用：{enabled}，对象是否激活：{gameObject.activeSelf}", this);
             octreeObject.BreakParent(true);
             octreeObject = null;
             isDead = false;
